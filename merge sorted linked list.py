@@ -48,14 +48,14 @@ def print_singly_linked_list(node, sep, fptr):
 #
 def mergeLists(head1, head2):
     current1 = head1
-    print('head1: ',head1.data,' head2: ',head2.data)
+    #print('head1: ',head1.data,' head2: ',head2.data)
     temp1 = head1.next
     temp2 = head2.next
     if head1.data < head2.data:
         
         while current1.next != None and current1.next.data < head2.data:
             current1 = current1.next
-            print('current1: ',current1.data,' head2: ',head2.data)
+            #print('current1: ',current1.data,' head2: ',head2.data)
         if current1.next == None:
             temp2 = head2.next
             current1.next = head2
