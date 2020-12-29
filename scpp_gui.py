@@ -1,4 +1,5 @@
 from tkinter import *
+import scpp2
 
 main = Tk()
 #copy_type_radiobuttons = Radiobutton(main, )
