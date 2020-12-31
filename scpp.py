@@ -13,6 +13,7 @@ def scp(source_ssh_file, source_username, source_host, target_ssh_file, copy_fil
     def ssh(ssh_file, hostname, username):
 
         client = paramiko.SSHClient()
+        print('ssh_file: ',ssh_file)
         key = paramiko.RSAKey.from_private_key_file(filename = ssh_file)
         #client.load_system_host_keys(filename = ssh_file)
         client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -36,5 +37,5 @@ def scp(source_ssh_file, source_username, source_host, target_ssh_file, copy_fil
      #   scp.get(files = files)
     ssh_source.close()
     ssh_target.close()
-
-scp(source_ssh_file = r'C:/Users/krish/Downloads/inst-trial-2.pem', source_username ='ubuntu', source_host = '13.235.77.46', target_ssh_file = r'C:/Users/krish/Downloads/docker.pem', copy_filepath = '/home/ubuntu/linkedin/README.md', target_username = 'root', target_host = '134.209.148.94', target_directory_path = '/root/')
+if __name__ == '__main__':
+    scp(source_ssh_file = r'C:/Users/krish/Downloads/inst-trial-2.pem', source_username ='ubuntu', source_host = '13.233.116.172', target_ssh_file = r'C:/Users/krish/Downloads/docker.pem', copy_filepath = '/home/ubuntu/laborum/laborum.py', target_username = 'root', target_host = '134.209.148.94', target_directory_path = '/root/')
