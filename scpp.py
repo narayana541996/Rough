@@ -4,7 +4,7 @@ import os
 import shutil
 from subprocess import *
 
-def scp(source_ssh_file, source_username, source_host, target_ssh_file, copy_filepath, target_username, target_host, target_directory_path, recursive, establish_trust = True):
+def scp(source_ssh_file, source_username, source_host, target_ssh_file, copy_filepath, target_username, target_host, target_directory_path, recursive, establish_trust = True, target_password = ''):
     filename = copy_filepath.split('/')[-1]
     def scp_to(scp_client, target_directory_path, recursive):
         print('working on it...')
@@ -30,20 +30,21 @@ def scp(source_ssh_file, source_username, source_host, target_ssh_file, copy_fil
     ssh_target = ssh(ssh_file = target_ssh_file, hostname = target_host, username = target_username)
     target_scp_client = SCPClient(ssh_target.get_transport())
     scp_to(target_scp_client, target_directory_path, recursive)
-    if establish_trust:
-        copy_key(ssh_source, source_ssh_file, target_username, target_host)#######replace source path with the path in the other server
-        print('Established trust.')
+    #if establish_trust:
+     #   copy_key(source_ssh_file, source_username, source_host, target_username, target_host, target_password)#######replace source path with the path in the other server
+      #  print('Established trust.')
     if os.path.isdir(filename):
         shutil.rmtree(filename)
     if os.path.isfile(filename):
         os.remove(filename)
     print('Done!')
 
-def copy_key(ssh_source, ssh_file, target_username, target_ip):#####might have to merge generate_key and copy_key.
+def copy_key(ssh_file, source_username, source_host, target_username, target_ip, target_password = ''):
     #call('ssh-copy-id -i {} {}@{}'.format(ssh_file, target_username, target_ip))
     #copy = Popen(['ssh-copy-id', '-i', ssh_file, f'{target_username}@{target_ip}'], shell = False, stdout = PIPE, stderr = PIPE)
-    stdin, stdout, stderr = ssh_source.exec_command('ssh-copy-id -i {} {}@{}'.format(ssh_file, target_username, target_ip))
-    print('copy stdout: ', stdout)
+    run(['ssh','-i',f'{ssh_file}',f'{source_username}@{source_host}'], text = True, input = 'yes')
+    out = run('ssh-copy-id -i {} {}@{}'.format(ssh_file, target_username, target_ip).split(), text = True, capture_output = True, input = target_password)
+    print('copy out: ', out)
     return stdout
 
 def generate_key():
