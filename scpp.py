@@ -4,7 +4,7 @@ import os
 import shutil
 from subprocess import *
 
-def scp(source_ssh_file, source_username, source_host, target_ssh_file, copy_filepath, target_username, target_host, target_directory_path, recursive, establish_trust = True, target_password = ''):
+def scp(source_ssh_file, source_username, source_host, target_ssh_file, copy_filepath, target_username, target_host, target_directory_path, recursive, establish_trust = True, source_password = '', target_password = ''):
     filename = copy_filepath.split('/')[-1]
     def scp_to(scp_client, target_directory_path, recursive):
         print('working on it...')
@@ -47,17 +47,19 @@ def copy_key(ssh_file, source_username, source_host, target_username, target_ip,
     print('copy out: ', out)
     return stdout
 
-def generate_key():
+def generate_key(bits = '1024', create_key_filename, create_key_password):
+    key = paramiko.RSAKey.generate(bits = bits).write_private_key_file(create_key_filename, create_key_password)
     #call(['ssh-keygen'])
-    key_gen = Popen(['ssh-keygen'], shell = False, stdout = PIPE, stderr = PIPE)
-    key = key_gen.stdout.readlines()
-    if key == []:
-        key = key_gen.stderr.readlines()
-    print('generate stdout: ', stdout)
-    return key
+    #key_gen = Popen(['ssh-keygen'], shell = False, stdout = PIPE, stderr = PIPE, text = True)
+    #key = key_gen.stdout.readlines()
+    #if key == []:
+     #   key = key_gen.stderr.readlines()
+    #print('generate stdout: ', stdout)
+    #return key_gen
     #with SCPClient(ssh.get_transport()) as scp:
      #   scp.get(files = files)
     ssh_source.close()
     ssh_target.close()
 if __name__ == '__main__':
-    scp(source_ssh_file = r'C:/Users/krish/Downloads/inst-trial-2.pem', source_username ='ubuntu', source_host = '13.127.7.213', target_ssh_file = r'C:/Users/krish/Downloads/docker.pem', copy_filepath = '/home/ubuntu/laborum/laborum.py', target_username = 'root', target_host = '134.209.148.94', target_directory_path = '/root/', recursive = True)
+    #scp(source_ssh_file = r'C:/Users/krish/Downloads/inst-trial-2.pem', source_username ='ubuntu', source_host = '52.66.249.107', target_ssh_file = r'C:/Users/krish/Downloads/docker.pem', copy_filepath = '/home/ubuntu/laborum/laborum.py', target_username = 'root', target_host = '134.209.148.94', target_directory_path = '/root/', recursive = True)
+    copy_key(generate_key('key_file'), source_username = 'ubuntu',source_host = '52.66.249.107', target_username = 'root', target_ip = '134.209.148.94', target_password = '7s#taQvFdbxhz5s#FsY9' )
