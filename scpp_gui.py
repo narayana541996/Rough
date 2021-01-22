@@ -1,6 +1,8 @@
 from tkinter import *
 import scpp
 import threading
+from tkinter.ttk import *
+from ttkthemes import *
 
 def local_scp(source_ssh_file_entry, source_username_entry, source_hostname_entry, target_ssh_file_entry, copy_filepath_entry, target_username_entry, target_hostname_entry, target_folderpath_entry, recursive):
     scpp.scp(source_ssh_file = source_ssh_file_entry.get().strip().replace('\\','/'), source_username = source_username_entry.get().strip().replace('\\','/'), source_host = source_hostname_entry.get().strip().replace('\\','/'), target_ssh_file = target_ssh_file_entry.get().strip().replace('\\','/'), copy_filepath = copy_filepath_entry.get().strip().replace('\\','/'), target_username = target_username_entry.get().strip().replace('\\','/'), target_host = target_hostname_entry.get().strip().replace('\\','/'), target_directory_path = target_folderpath_entry.get().strip().replace('\\','/'), recursive = recursive.get())
@@ -11,7 +13,12 @@ def set_auth_mode(disabled, normal):
     for item in normal:
         item['state'] = 'normal'
 
-main = Tk()
+root = Tk()
+main = Frame(root)
+main.pack()
+style = ThemedStyle(main)
+style.set_theme('vista')
+#style.configure('TButton', justify = 'center')
 recursive = BooleanVar(main)
 authentication = StringVar(main)
 recursive.set(True)
