@@ -4,7 +4,7 @@ import os
 import shutil
 from subprocess import *
 
-def scp(source_ssh_file, source_username, source_host, target_ssh_file, copy_filepath, target_username, target_host, target_directory_path, recursive, establish_trust = True, source_password = '', target_password = ''):
+def scp(source_ssh_file, source_username, source_host, target_ssh_file, copy_filepath, target_username, target_host, target_directory_path, recursive, establish_trust = True, source_password = '', target_password = '', create_key_filename = 'id_rsa', create_key_password = None, bits = '1024'):
     filename = copy_filepath.split('/')[-1]
     def scp_to(scp_client, target_directory_path, recursive):
         print('working on it...')
@@ -13,6 +13,10 @@ def scp(source_ssh_file, source_username, source_host, target_ssh_file, copy_fil
     def scp_from(scp_client, source_filepath, recursive):
         print('working on it...')
         scp_client.get(remote_path = source_filepath.strip(), recursive = recursive)
+
+    def generate_key(create_key_filename, bits = '1024', create_key_password = None):
+        paramiko.RSAKey.generate(bits = int(bits)).write_private_key_file(create_key_filename, create_key_password)
+        return create_key_filename
 
     def ssh(ssh_file, hostname, username):
         
@@ -30,25 +34,30 @@ def scp(source_ssh_file, source_username, source_host, target_ssh_file, copy_fil
     ssh_target = ssh(ssh_file = target_ssh_file, hostname = target_host, username = target_username)
     target_scp_client = SCPClient(ssh_target.get_transport())
     scp_to(target_scp_client, target_directory_path, recursive)
-    #if establish_trust:
-     #   copy_key(source_ssh_file, source_username, source_host, target_username, target_host, target_password)#######replace source path with the path in the other server
-      #  print('Established trust.')
+    if establish_trust:
+        key = open(generate_key(create_key_filename, bits, create_key_password)).read()
+        #client.exec_command(f'ssh -i {target_ssh_file} {target_username}@{target_host}')
+        ssh_target.exec_command(f'echo "{key}" > ~/.ssh/authorized_keys')
+        ssh_source.exec_command(f'ssh {target_username}@{target_host}')
+        print('Established trust.')
     if os.path.isdir(filename):
         shutil.rmtree(filename)
     if os.path.isfile(filename):
         os.remove(filename)
     print('Done!')
 
-def copy_key(ssh_file, source_username, source_host, target_username, target_ip, target_password = ''):
+def copy_key(ssh_file, target_username, target_ip, target_password):
+    client = paramiko.SSHClient()
+    key = open(ssh_file).read()
+    client.exec_command(f'ssh -i {target_ssh_file} {target_username}@{target_ip}')
+    client.exec_command('echo "%s" > ~/.ssh/authorized_keys'%(key))
     #call('ssh-copy-id -i {} {}@{}'.format(ssh_file, target_username, target_ip))
     #copy = Popen(['ssh-copy-id', '-i', ssh_file, f'{target_username}@{target_ip}'], shell = False, stdout = PIPE, stderr = PIPE)
-    run(['ssh','-i',f'{ssh_file}',f'{source_username}@{source_host}'], text = True, input = 'yes')
-    out = run('ssh-copy-id -i {} {}@{}'.format(ssh_file, target_username, target_ip).split(), text = True, capture_output = True, input = target_password)
-    print('copy out: ', out)
-    return stdout
+    #run(['ssh','-i',f'{ssh_file}',f'{source_username}@{source_host}'], text = True, input = 'yes')
+    #out = run('ssh-copy-id -i {} {}@{}'.format(ssh_file, target_username, target_ip).split(), text = True, capture_output = True, input = target_password)
+    #print('copy out: ', out)
+    #return stdout
 
-def generate_key(bits = '1024', create_key_filename, create_key_password):
-    key = paramiko.RSAKey.generate(bits = bits).write_private_key_file(create_key_filename, create_key_password)
     #call(['ssh-keygen'])
     #key_gen = Popen(['ssh-keygen'], shell = False, stdout = PIPE, stderr = PIPE, text = True)
     #key = key_gen.stdout.readlines()
@@ -61,5 +70,5 @@ def generate_key(bits = '1024', create_key_filename, create_key_password):
     ssh_source.close()
     ssh_target.close()
 if __name__ == '__main__':
-    #scp(source_ssh_file = r'C:/Users/krish/Downloads/inst-trial-2.pem', source_username ='ubuntu', source_host = '52.66.249.107', target_ssh_file = r'C:/Users/krish/Downloads/docker.pem', copy_filepath = '/home/ubuntu/laborum/laborum.py', target_username = 'root', target_host = '134.209.148.94', target_directory_path = '/root/', recursive = True)
-    copy_key(generate_key('key_file'), source_username = 'ubuntu',source_host = '52.66.249.107', target_username = 'root', target_ip = '134.209.148.94', target_password = '' )
+    scp(source_ssh_file = r'C:/Users/krish/Downloads/inst-trial-2.pem', source_username ='ubuntu', source_host = '35.154.220.76', target_ssh_file = r'C:/Users/krish/Downloads/docker.pem', copy_filepath = '/home/ubuntu/laborum/laborum.py', target_username = 'root', target_host = '134.209.148.94', target_directory_path = '/root/', recursive = True)
+    #copy_key(generate_key('key_file', '1024', None), target_username = 'root', target_ip = '134.209.148.94')
