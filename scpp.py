@@ -37,8 +37,9 @@ def scp(source_ssh_file, source_username, source_host, target_ssh_file, copy_fil
     if establish_trust:
         key = open(generate_key(create_key_filename, bits, create_key_password)).read()
         #client.exec_command(f'ssh -i {target_ssh_file} {target_username}@{target_host}')
-        ssh_target.exec_command(f'echo "{key}" > ~/.ssh/authorized_keys')
-        ssh_source.exec_command(f'ssh {target_username}@{target_host}')
+        stdin1, stdout1, stderr1 = ssh_target.exec_command(f'echo "{key}" > ~/.ssh/authorized_keys')
+        stdin2, stdout2, stderr2 = ssh_source.exec_command(f'ssh {target_username}@{target_host}')
+        print('stdin1: ',stdin1,' stdout1: ',stdout1,' stderr1: ',stderr1,' stdin2: ', stdin2,' stdout2: ', stdout2,' stderr2: ', stderr2)
         print('Established trust.')
     if os.path.isdir(filename):
         shutil.rmtree(filename)
