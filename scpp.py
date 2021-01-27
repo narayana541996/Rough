@@ -18,20 +18,36 @@ def scp(source_ssh_file, source_username, source_host, target_ssh_file, copy_fil
         paramiko.RSAKey.generate(bits = int(bits)).write_private_key_file(create_key_filename, create_key_password)
         return create_key_filename
 
-    def ssh(ssh_file, hostname, username):
+    def ssh(ssh_file, hostname, username, password = None):
         
         client = paramiko.SSHClient()
         #print('ssh_file: ',ssh_file)
         key = paramiko.RSAKey.from_private_key_file(filename = ssh_file)
         client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        client.connect(hostname = hostname, username = username, port = 22, pkey = key)
-        print(hostname,' connected.')
+        try:
+            client.connect(hostname = hostname, username = username, port = 22, pkey = key)
+        except paramiko.AuthenticationException:
+            try:
+                print('ssh_file: ',ssh_file)
+                os.chmod(ssh_file, 0o700)
+                print('run chmod')
+                client.connect(hostname = hostname, username = username, port = 22, pkey = key)
+
+            except paramiko.AuthenticationException:
+                if password:
+                    client.connect(hostname = hostname, username = username, port = 22, password = password)
+                else:
+                    print(f'Cannot access {username}@{hostname} with the given key. Please try using a different key or password.')
+                    #return f'Cannot access {username}@{hostname} with the given key. Please try using a different key or password.'
+                    exit()
+        else:
+            print(hostname,' connected.')
         return client
 
     ssh_source = ssh(ssh_file = source_ssh_file, hostname = source_host, username = source_username)
     source_scp_client = SCPClient(ssh_source.get_transport())
     scp_from(source_scp_client, copy_filepath, recursive)
-    ssh_target = ssh(ssh_file = target_ssh_file, hostname = target_host, username = target_username)
+    ssh_target = ssh(ssh_file = target_ssh_file, hostname = target_host, username = target_username, password = '7s#taQvFdbxhz5s#FsY9')
     target_scp_client = SCPClient(ssh_target.get_transport())
     scp_to(target_scp_client, target_directory_path, recursive)
     if establish_trust:
@@ -71,5 +87,5 @@ def copy_key(ssh_file, target_username, target_ip, target_password):
     ssh_source.close()
     ssh_target.close()
 if __name__ == '__main__':
-    scp(source_ssh_file = r'C:/Users/krish/Downloads/inst-trial-2.pem', source_username ='ubuntu', source_host = '35.154.220.76', target_ssh_file = r'C:/Users/krish/Downloads/docker.pem', copy_filepath = '/home/ubuntu/laborum/laborum.py', target_username = 'root', target_host = '134.209.148.94', target_directory_path = '/root/', recursive = True)
+    scp(source_ssh_file = r'C:/Users/krish/Downloads/inst-trial-2.pem', source_username ='ubuntu', source_host = '65.0.122.94', target_ssh_file = r'C:/Users/krish/Downloads/docker.pem', copy_filepath = '/home/ubuntu/laborum/laborum.py', target_username = 'root', target_host = '134.209.148.94', target_directory_path = '/root/', recursive = True)
     #copy_key(generate_key('key_file', '1024', None), target_username = 'root', target_ip = '134.209.148.94')
