@@ -5,7 +5,7 @@ import shutil
 from subprocess import *
 
 ############add current date and time to the name of the new key created.
-def scp(source_ssh_file, source_username, source_host, target_ssh_file, copy_filepath, target_username, target_host, target_directory_path, recursive, establish_trust = True, source_password = '', target_password = '', create_key_filename = 'new_key', create_key_password = None, bits = '1024'):
+def scp(source_ssh_file, source_username, source_host, target_ssh_file, copy_filepath, target_username, target_host, target_directory_path, recursive, establish_trust = True, source_password = '', target_password = '', create_key_filename = 'new_key', bits = '1024'):
     filename = copy_filepath.split('/')[-1]
     def scp_to(scp_client, target_directory_path, recursive, files = filename):
         print(f'copying to {target_directory_path}...')
@@ -15,12 +15,12 @@ def scp(source_ssh_file, source_username, source_host, target_ssh_file, copy_fil
         print(f'copying from {source_filepath}...')
         scp_client.get(remote_path = source_filepath.strip(), recursive = recursive)
 
-    def generate_key(client, create_key_filename, bits = '1024', create_key_password = None):
+    def generate_key(client, create_key_filename, bits = '1024'):
         #paramiko.RSAKey.generate(bits = int(bits)).write_private_key_file(create_key_filename, create_key_password)
-        if create_key_password == None or create_key_password == '':#######check if the file already exists.
-            stdin, stdout, stderr = client.exec_command(f'ssh-keygen -b {bits} -f ~/.ssh/{create_key_filename}')
-        else:
-            stdin, stdout, stderr = client.exec_command(f'ssh-keygen -b {bits} -f ~/.ssh/{create_key_filename} -N {create_key_password}')
+        #if create_key_password == None or create_key_password == '':#######check if the file already exists.
+        stdin, stdout, stderr = client.exec_command(f'ssh-keygen -b {bits} -f ~/.ssh/{create_key_filename}')
+        #else:
+        #stdin, stdout, stderr = client.exec_command(f'ssh-keygen -b {bits} -f ~/.ssh/{create_key_filename} -N {create_key_password}')
         stdin2, stdout2, stderr2 = client.exec_command(f'chmod 0600 ~/.ssh/{create_key_filename}')
         #print('generate_key:\nstdout: ', stdout.read(),' stderr: ', stderr.read(),' stdout2: ',stdout2.read(),' stderr2: ', stderr2.read())
         #return create_key_filename
@@ -63,12 +63,16 @@ def scp(source_ssh_file, source_username, source_host, target_ssh_file, copy_fil
     scp_to(target_scp_client, target_directory_path, recursive)
     if establish_trust:
         ####check if the trust is already established.
-        generate_key(ssh_source, create_key_filename, bits, create_key_password)
+        generate_key(ssh_source, create_key_filename, bits)
         #run(['scp','-i',target_ssh_file, '-o', f"PubkeyAuthentication {source_ssh_file}", f'{source_username}@{source_host}:~/.ssh'])
+        print('target_ssh_file: ',target_ssh_file.split("/"))
         scp_to(scp_client = source_scp_client, target_directory_path = '~/.ssh', recursive = recursive, files = target_ssh_file)
+        chin, chout, cherr = ssh_source.exec_command(f'chmod 0600 ~/.ssh/{target_ssh_file.split("/")[-1]}')
+        print('chout: ',chout.read(),' cherr: ',cherr.read())
         stdin1, stdout1, stderr1 = ssh_source.exec_command(f'ssh-copy-id -i ~/.ssh/{create_key_filename} -o "PubkeyAuthentication ~/.ssh/{target_ssh_file.split("/")[-1]}" {target_username}@{target_host}')
+        print('stdout1: ',stdout1.read(),' stderr1: ',stderr1.read())
         stdin2, stdout2, stderr2 = ssh_source.exec_command(f'ssh {target_username}@{target_host}')
-        print('stdout1: ',stdout1.read(),' stderr1: ',stderr1.read(),' stdout2: ', stdout2.read(),' stderr2: ', stderr2.read())
+        print('stdout2: ', stdout2.read(),' stderr2: ', stderr2.read())
         print('Established trust.')
     if os.path.isdir(filename):
         shutil.rmtree(filename)
