@@ -4,7 +4,7 @@ import os
 import shutil
 from subprocess import *
 
-############add current date and time to the new key created.
+############add current date and time to the name of the new key created.
 def scp(source_ssh_file, source_username, source_host, target_ssh_file, copy_filepath, target_username, target_host, target_directory_path, recursive, establish_trust = True, source_password = '', target_password = '', create_key_filename = 'new_key', create_key_password = None, bits = '1024'):
     filename = copy_filepath.split('/')[-1]
     def scp_to(scp_client, target_directory_path, recursive, files = filename):
@@ -21,7 +21,7 @@ def scp(source_ssh_file, source_username, source_host, target_ssh_file, copy_fil
             stdin, stdout, stderr = client.exec_command(f'ssh-keygen -b {bits} -f ~/.ssh/{create_key_filename}')
         else:
             stdin, stdout, stderr = client.exec_command(f'ssh-keygen -b {bits} -f ~/.ssh/{create_key_filename} -N {create_key_password}')
-        stdin2, stdout2, stderr2 = client.exec_command(f'chmod 600 ~/.ssh/{create_key_filename}')
+        stdin2, stdout2, stderr2 = client.exec_command(f'chmod 0600 ~/.ssh/{create_key_filename}')
         #print('generate_key:\nstdout: ', stdout.read(),' stderr: ', stderr.read(),' stdout2: ',stdout2.read(),' stderr2: ', stderr2.read())
         #return create_key_filename
 
@@ -78,4 +78,4 @@ def scp(source_ssh_file, source_username, source_host, target_ssh_file, copy_fil
     ssh_source.close()
     ssh_target.close()
 if __name__ == '__main__':
-    scp(source_ssh_file = r'C:/Users/krish/Downloads/inst-trial-3.pem', source_username ='ubuntu', source_host = '15.207.99.188', source_password = '', target_ssh_file = r'C:/Users/krish/.ssh/id_rsa', copy_filepath = '/home/ubuntu/upload_test', target_username = 'root', target_host = '134.209.148.94', target_directory_path = '~/', recursive = True, target_password = '')
+    scp(source_ssh_file = r'C:/Users/krish/Downloads/inst-trial-3.pem', source_username ='ubuntu', source_host = '65.0.199.88', source_password = '', target_ssh_file = r'C:/Users/krish/.ssh/id_rsa', copy_filepath = '/home/ubuntu/upload_test', target_username = 'root', target_host = '134.209.148.94', target_directory_path = '~/', recursive = True, target_password = '')
