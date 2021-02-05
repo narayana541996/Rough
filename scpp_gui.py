@@ -3,9 +3,9 @@ import scpp
 import threading
 from tkinter.ttk import *
 from ttkthemes import *
-
+#########Remove the entry to select file name of the new_key to establish trust.
 def local_scp(source_ssh_file_entry, source_username_entry, source_hostname_entry, target_ssh_file_entry, copy_filepath_entry, target_username_entry, target_hostname_entry, target_folderpath_entry, recursive, trust, create_key_filename_entry, create_key_bits = 1024):
-    scpp.scp(source_ssh_file = source_ssh_file_entry.get().strip().replace('\\','/'), source_username = source_username_entry.get().strip().replace('\\','/'), source_host = source_hostname_entry.get().strip().replace('\\','/'), target_ssh_file = target_ssh_file_entry.get().strip().replace('\\','/'), copy_filepath = copy_filepath_entry.get().strip().replace('\\','/'), target_username = target_username_entry.get().strip().replace('\\','/'), target_host = target_hostname_entry.get().strip().replace('\\','/'), target_directory_path = target_folderpath_entry.get().strip().replace('\\','/'), recursive = recursive.get(), create_key_bits = create_key_bits, create_key_filename = create_key_filename_entry.get().strip().replace('\\', '/'), establish_trust = trust)
+    scpp.scp(source_ssh_file = source_ssh_file_entry.get().strip().replace('\\','/'), source_username = source_username_entry.get().strip().replace('\\','/'), source_host = source_hostname_entry.get().strip().replace('\\','/'), target_ssh_file = target_ssh_file_entry.get().strip().replace('\\','/'), copy_filepath = copy_filepath_entry.get().strip().replace('\\','/'), target_username = target_username_entry.get().strip().replace('\\','/'), target_host = target_hostname_entry.get().strip().replace('\\','/'), target_directory_path = target_folderpath_entry.get().strip().replace('\\','/'), recursive = recursive.get(), establish_trust = trust, create_key_bits = create_key_bits, create_key_filename = create_key_filename_entry.get().strip().replace('\\', '/'), establish_trust = trust)
 
 def set_mode(disabled, normal, *args, **kwargs):
     for item in disabled:
@@ -109,7 +109,6 @@ create_key_filename_label.grid(row = 18, column = 0, padx = 4, pady = 4, sticky 
 create_key_filename_entry = Entry(main, width = 50, state = 'disabled')
 create_key_filename_entry.grid(row = 19, column = 0, padx = 4, pady = 4, sticky = 'w')
 trust_button.configure(command = lambda: set_trust_mode(checkbutton = trust_button, trust = trust, items = (create_key_filename_label, create_key_filename_entry)))
-#set_trust_mode(trust_button, trust, (create_key_filename_label, create_key_filename_entry))
 #create_key_password_label = Label(main, text = 'Enter a password for the key(if required): ')
 #create_key_password_label.grid(row = 18, column = 1, padx = 4, pady = 4, sticky = 'w')
 #create_key_password_entry = Entry(main, width = 50)

@@ -6,7 +6,7 @@ from subprocess import *
 from datetime import datetime
 
 ############check current date and time in the name of the new key created.
-def scp(source_ssh_file, source_username, source_host, target_ssh_file, copy_filepath, target_username, target_host, target_directory_path, recursive, establish_trust = True, source_password = '', target_password = '', create_key_filename = datetime.now().strftime('%b-%d-%y-%X')+' new_scpp_key', create_key_bits = '1024'):
+def scp(source_ssh_file, source_username, source_host, target_ssh_file, copy_filepath, target_username, target_host, target_directory_path, recursive, establish_trust = True, source_password = '', target_password = '', create_key_filename = f'scpp_key_{datetime.now().strftime("%d-%b-%y-%X")}', create_key_bits = '1024'):
     filename = copy_filepath.split('/')[-1]
     def scp_to(scp_client, target_directory_path, recursive, files = filename):
         print(f'copying to {target_directory_path}...')
@@ -64,17 +64,25 @@ def scp(source_ssh_file, source_username, source_host, target_ssh_file, copy_fil
     scp_to(target_scp_client, target_directory_path, recursive)
     if establish_trust:
         ####check if the trust is already established.
-        generate_key(ssh_source, create_key_filename, create_key_bits)
-        #run(['scp','-i',target_ssh_file, '-o', f"PubkeyAuthentication {source_ssh_file}", f'{source_username}@{source_host}:~/.ssh'])
-        print('target_ssh_file: ',target_ssh_file.split("/"))
-        scp_to(scp_client = source_scp_client, target_directory_path = '~/.ssh', recursive = recursive, files = target_ssh_file)
-        chin, chout, cherr = ssh_source.exec_command(f'chmod 0600 ~/.ssh/{target_ssh_file.split("/")[-1]}')
-        print('chout: ',chout.read(),' cherr: ',cherr.read())
-        stdin1, stdout1, stderr1 = ssh_source.exec_command(f'ssh-copy-id -i ~/.ssh/{create_key_filename} -o "IdentityFile ~/.ssh/{target_ssh_file.split("/")[-1]}" {target_username}@{target_host}')
-        print('stdout1: ',stdout1.read(),' stderr1: ',stderr1.read())
         stdin2, stdout2, stderr2 = ssh_source.exec_command(f'ssh {target_username}@{target_host}')
-        print('stdout2: ', stdout2.read(),' stderr2: ', stderr2.read())
-        print('Established trust.')
+        print('stdout2: ',stdout2.read(),' stderr2: ',stderr2.read())
+        if stdout2:
+            generate_key(ssh_source, create_key_filename, create_key_bits)
+            #run(['scp','-i',target_ssh_file, '-o', f"PubkeyAuthentication {source_ssh_file}", f'{source_username}@{source_host}:~/.ssh'])
+            print('target_ssh_file: ',target_ssh_file.split("/"))
+            #######target's private key is being sent to the source, why create a new key to establish trust?
+            #######try removing the target's private key after ssh-copy-id.
+            scp_to(scp_client = source_scp_client, target_directory_path = '~/.ssh', recursive = recursive, files = target_ssh_file)
+            chin, chout, cherr = ssh_source.exec_command(f'chmod 0600 ~/.ssh/{target_ssh_file.split("/")[-1]}')
+            print('chout: ',chout.read(),' cherr: ',cherr.read())
+            stdin1, stdout1, stderr1 = ssh_source.exec_command(f'ssh-copy-id -i ~/.ssh/{create_key_filename} -o "IdentityFile ~/.ssh/{target_ssh_file.split("/")[-1]}" {target_username}@{target_host}')
+            print('stdout1: ',stdout1.read(),' stderr1: ',stderr1.read())
+            stdin2, stdout2, stderr2 = ssh_source.exec_command(f'ssh {target_username}@{target_host}')
+            print('stdout2: ', stdout2.read(),' stderr2: ', stderr2.read())
+            print('Established trust.')
+        else:
+            print('Trust already established...')
+            trin, trout, trerr = ssh_source.exec_command('ls')
     if os.path.isdir(filename):
         shutil.rmtree(filename)
     if os.path.isfile(filename):
@@ -83,4 +91,4 @@ def scp(source_ssh_file, source_username, source_host, target_ssh_file, copy_fil
     ssh_source.close()
     ssh_target.close()
 if __name__ == '__main__':
-    scp(source_ssh_file = r'C:/Users/krish/Downloads/inst-trial-3.pem', source_username ='ubuntu', source_host = '13.233.68.105', source_password = '', target_ssh_file = r'C:/Users/krish/.ssh/id_rsa', copy_filepath = '/home/ubuntu/upload_test', target_username = 'root', target_host = '134.209.148.94', target_directory_path = '~/', recursive = True, target_password = '')
+    scp(source_ssh_file = r'C:/Users/krish/Downloads/inst-trial-3.pem', source_username ='ubuntu', source_host = '65.0.127.14', source_password = '', target_ssh_file = r'C:/Users/krish/.ssh/id_rsa', copy_filepath = '/home/ubuntu/upload_test', target_username = 'root', target_host = '134.209.148.94', target_directory_path = '~/', recursive = True, target_password = '')
