@@ -4,8 +4,8 @@ import threading
 from tkinter.ttk import *
 from ttkthemes import *
 #########Remove the entry to select file name of the new_key to establish trust.
-def local_scp(source_ssh_file_entry, source_username_entry, source_hostname_entry, target_ssh_file_entry, copy_filepath_entry, target_username_entry, target_hostname_entry, target_folderpath_entry, recursive, trust, create_key_filename_entry, create_key_bits = 1024):
-    scpp.scp(source_ssh_file = source_ssh_file_entry.get().strip().replace('\\','/'), source_username = source_username_entry.get().strip().replace('\\','/'), source_host = source_hostname_entry.get().strip().replace('\\','/'), target_ssh_file = target_ssh_file_entry.get().strip().replace('\\','/'), copy_filepath = copy_filepath_entry.get().strip().replace('\\','/'), target_username = target_username_entry.get().strip().replace('\\','/'), target_host = target_hostname_entry.get().strip().replace('\\','/'), target_directory_path = target_folderpath_entry.get().strip().replace('\\','/'), recursive = recursive.get(), establish_trust = trust, create_key_bits = create_key_bits, create_key_filename = create_key_filename_entry.get().strip().replace('\\', '/'))
+def local_scp(source_ssh_file_entry, source_username_entry, source_hostname_entry, target_ssh_file_entry, copy_filepath_entry, target_username_entry, target_hostname_entry, target_folderpath_entry, recursive, trust, connect_target_key_file_entry, create_key_bits = 1024):
+    scpp.scp(source_ssh_file = source_ssh_file_entry.get().strip().replace('\\','/'), source_username = source_username_entry.get().strip().replace('\\','/'), source_host = source_hostname_entry.get().strip().replace('\\','/'), target_ssh_file = target_ssh_file_entry.get().strip().replace('\\','/'), copy_filepath = copy_filepath_entry.get().strip().replace('\\','/'), target_username = target_username_entry.get().strip().replace('\\','/'), target_host = target_hostname_entry.get().strip().replace('\\','/'), target_directory_path = target_folderpath_entry.get().strip().replace('\\','/'), recursive = recursive.get(), establish_trust = trust, create_key_bits = create_key_bits, connect_target_key_filename = connect_target_key_file_entry.get().strip().replace('\\', '/'))
 
 def set_mode(disabled, normal, *args, **kwargs):
     for item in disabled:
@@ -31,9 +31,11 @@ style.set_theme('vista')
 recursive = BooleanVar(main)
 authentication = StringVar(main)
 trust = BooleanVar(main)
+trust_key = StringVar(main)
 recursive.set(True)
 authentication.set('ssh')
 trust.set(False)
+trust_key.set('new')
 #copy_type_radiobuttons = Radiobutton(main, )
 source_hostname_label = Label(main, text = 'Source IP/Hostname: ')
 source_hostname_label.grid(row = 1, column = 0, padx = 4, pady = 4, sticky = 'w')
@@ -104,19 +106,21 @@ ssh_radiobutton.invoke()
 
 trust_button = Checkbutton(main, text = 'Establish trust between the servers.', variable = trust, onvalue = True, offvalue = False)
 trust_button.grid(row = 17, column = 0, padx = 4, pady = 4, sticky = 'w')
-create_key_filename_label = Label(main, text = 'Enter the key\'s filename: ', state = 'disabled')
-create_key_filename_label.grid(row = 18, column = 0, padx = 4, pady = 4, sticky = 'w')
-create_key_filename_entry = Entry(main, width = 50, state = 'disabled')
-create_key_filename_entry.grid(row = 19, column = 0, padx = 4, pady = 4, sticky = 'w')
-trust_button.configure(command = lambda: set_trust_mode(checkbutton = trust_button, trust = trust, items = (create_key_filename_label, create_key_filename_entry)))
-#create_key_password_label = Label(main, text = 'Enter a password for the key(if required): ')
-#create_key_password_label.grid(row = 18, column = 1, padx = 4, pady = 4, sticky = 'w')
-#create_key_password_entry = Entry(main, width = 50)
-#create_key_password_entry.grid(row = 19, column = 1, padx = 4, pady = 4, sticky = 'w')
+trust_old_button = Radiobutton(main, text = 'Use existing key-pair to establish trust\nbetween the source and the target.', variable = trust_key, value = 'old')
+trust_old_button.grid(row = 18, column = 0, padx = 4, pady = 4, sticky = 'w')
+connect_target_key_file_label = Label(main, text = 'Enter the path of the key-pair on the source to establish trust: ', state = 'disabled')
+connect_target_key_file_label.grid(row = 19, column = 0, padx = 4, pady = 4, sticky = 'w')
+connect_target_key_file_entry = Entry(main, width = 50, state = 'disabled')
+connect_target_key_file_entry.grid(row = 20, column = 0, padx = 4, pady = 4, sticky = 'w')
+trust_new_button = Radiobutton(main, text = 'Create new key-pair to establish trust\nbetween the source and the target.', variable = trust_key, value = 'new')
+trust_new_button.grid(row = 18, column = 1, padx = 4, pady = 4, sticky = 'w')
+trust_button.configure(command = lambda: set_trust_mode(checkbutton = trust_button, trust = trust, items = (trust_old_button, trust_new_button)))
+trust_old_button.configure(command = lambda: set_mode(normal = (connect_target_key_file_label, connect_target_key_file_entry), disabled = ()), state = 'disabled')
+trust_new_button.configure(command = lambda: set_mode(disabled = (connect_target_key_file_label, connect_target_key_file_entry), normal = ()), state = 'disabled')
 
 copy_button = Button(main, text = 'Copy', command = lambda source_ssh_file_entry = source_ssh_file_entry, source_username_entry = source_username_entry, source_hostname_entry = source_hostname_entry, target_ssh_file_entry = target_ssh_file_entry, copy_filepath_entry = copy_filepath_entry, target_username_entry = target_username_entry, target_hostname_entry = target_hostname_entry, target_folderpath_entry = target_folderpath_entry, recursive = recursive, source_password = source_ssh_password_entry, target_password = target_ssh_password_entry: threading.Thread(target = local_scp, args = (source_ssh_file_entry, source_username_entry, source_hostname_entry, target_ssh_file_entry, copy_filepath_entry, target_username_entry, target_hostname_entry, target_folderpath_entry, recursive, source_password, target_password)).start())
-copy_button.grid(row = 20, column = 0, padx = 4, pady = 4, columnspan = 2, sticky = 'nsew')
+copy_button.grid(row = 21, column = 0, padx = 4, pady = 4, columnspan = 2, sticky = 'nsew')
 
 recursive_checkbutton = Checkbutton(main, text = 'Recursive', variable = recursive, onvalue = True, offvalue = False)
-recursive_checkbutton.grid(row = 21, column = 0, padx = 4, pady = 4, columnspan = 2, sticky = 'w')
+recursive_checkbutton.grid(row = 22, column = 0, padx = 4, pady = 4, columnspan = 2, sticky = 'w')
 main.mainloop()
