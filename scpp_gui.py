@@ -4,8 +4,8 @@ import threading
 from tkinter.ttk import *
 from ttkthemes import *
 #########Remove the entry to select file name of the new_key to establish trust.
-def local_scp(source_ssh_file_entry, source_username_entry, source_hostname_entry, target_ssh_file_entry, copy_filepath_entry, target_username_entry, target_hostname_entry, target_folderpath_entry, recursive, trust, connect_target_key_file_entry, trust_key, create_key_bits = 1024):
-    scpp.scp(source_ssh_file = source_ssh_file_entry.get().strip().replace('\\','/'), source_username = source_username_entry.get().strip().replace('\\','/'), source_host = source_hostname_entry.get().strip().replace('\\','/'), target_ssh_file = target_ssh_file_entry.get().strip().replace('\\','/'), copy_filepath = copy_filepath_entry.get().strip().replace('\\','/'), target_username = target_username_entry.get().strip().replace('\\','/'), target_host = target_hostname_entry.get().strip().replace('\\','/'), target_directory_path = target_folderpath_entry.get().strip().replace('\\','/'), recursive = recursive.get(), establish_trust = trust, create_key_bits = create_key_bits, connect_target_key_filename = connect_target_key_file_entry.get().strip().replace('\\', '/'))
+def local_scp(source_ssh_file_entry, source_username_entry, source_hostname_entry, target_ssh_file_entry, copy_filepath_entry, target_username_entry, target_hostname_entry, target_folderpath_entry, recursive, trust, connect_target_key_file_entry, create_key_bits = 1024):
+    scpp.scp(source_ssh_file = source_ssh_file_entry.get().strip().replace('\\','/'), source_username = source_username_entry.get().strip().replace('\\','/'), source_host = source_hostname_entry.get().strip().replace('\\','/'), target_ssh_file = target_ssh_file_entry.get().strip().replace('\\','/'), copy_filepath = copy_filepath_entry.get().strip().replace('\\','/'), target_username = target_username_entry.get().strip().replace('\\','/'), target_host = target_hostname_entry.get().strip().replace('\\','/'), target_directory_path = target_folderpath_entry.get().strip().replace('\\','/'), recursive = recursive.get(), establish_trust = trust, create_key_bits = create_key_bits, connect_target_key_file = connect_target_key_file_entry.get().strip().replace('\\', '/'))
 
 def set_mode(disabled, normal, *args, **kwargs):
     for item in disabled:
@@ -69,7 +69,7 @@ target_folderpath_entry.grid(row = 8, column = 1, padx = 4, pady = 4, sticky = '
 ###add print statements to check the cause of the empty string
 #####Include entry for target_ssh_password and source_ssh_password.
 
-password_radiobutton = Radiobutton(main, text = 'Access with Password ', variable = authentication, value = 'password', command = lambda: set_mode(disabled = (source_ssh_file_label, source_ssh_file_entry, source_ssh_password_label, source_ssh_password_entry, target_ssh_file_label, target_ssh_file_entry, target_ssh_password_label, target_ssh_password_entry), normal = (source_password_label, source_password_entry, target_password_label, target_password_entry)))
+password_radiobutton = Radiobutton(main, text = 'Access with Password ', variable = authentication, value = 'password', command = lambda: set_mode(disabled = (source_ssh_file_label, source_ssh_file_entry, source_ssh_password_label, source_ssh_password_entry, target_ssh_file_label, target_ssh_file_entry, target_ssh_password_label, target_ssh_password_entry, trust_button), normal = (source_password_label, source_password_entry, target_password_label, target_password_entry)))
 password_radiobutton.grid(row = 9, column = 0, padx = 4, pady = 4, sticky = 'w')
 source_password_label = Label(main, text = 'Source Password: ')
 source_password_label.grid(row = 10, column = 0, padx = 4, pady = 4, sticky = 'w')
