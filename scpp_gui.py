@@ -69,6 +69,8 @@ target_folderpath_entry.grid(row = 8, column = 1, padx = 4, pady = 4, sticky = '
 ###add print statements to check the cause of the empty string
 #####Include entry for target_ssh_password and source_ssh_password.
 
+trust_button = Checkbutton(main, text = 'Establish trust between the servers.', variable = trust, onvalue = True, offvalue = False)
+
 password_radiobutton = Radiobutton(main, text = 'Access with Password ', variable = authentication, value = 'password', command = lambda: set_mode(disabled = (source_ssh_file_label, source_ssh_file_entry, source_ssh_password_label, source_ssh_password_entry, target_ssh_file_label, target_ssh_file_entry, target_ssh_password_label, target_ssh_password_entry, trust_button), normal = (source_password_label, source_password_entry, target_password_label, target_password_entry)))
 password_radiobutton.grid(row = 9, column = 0, padx = 4, pady = 4, sticky = 'w')
 source_password_label = Label(main, text = 'Source Password: ')
@@ -81,7 +83,7 @@ target_password_label.grid(row = 10, column = 1, padx = 4, pady = 4, sticky = 'w
 target_password_entry = Entry(main, width = 50)
 target_password_entry.grid(row = 11, column = 1, padx = 4, pady = 4, sticky = 'w')
 
-ssh_radiobutton = Radiobutton(main, text = 'Access with SSH', variable = authentication, value = 'ssh', command = lambda: set_mode(normal = (source_ssh_file_label, source_ssh_file_entry, source_ssh_password_label, source_ssh_password_entry, target_ssh_file_label, target_ssh_file_entry, target_ssh_password_label, target_ssh_password_entry), disabled = (source_password_label, source_password_entry, target_password_label, target_password_entry)))
+ssh_radiobutton = Radiobutton(main, text = 'Access with SSH', variable = authentication, value = 'ssh', command = lambda: set_mode(normal = (source_ssh_file_label, source_ssh_file_entry, source_ssh_password_label, source_ssh_password_entry, target_ssh_file_label, target_ssh_file_entry, target_ssh_password_label, target_ssh_password_entry, trust_button), disabled = (source_password_label, source_password_entry, target_password_label, target_password_entry)))
 ssh_radiobutton.grid(row = 12, column = 0, padx = 4, pady = 4, sticky = 'w')
 source_ssh_file_label = Label(main, text = 'Source SSH Key-File Path: ')
 source_ssh_file_label.grid(row = 13, column = 0, padx = 4, pady = 4, sticky = 'w')
@@ -104,7 +106,6 @@ target_ssh_password_entry.grid(row = 16, column = 1, padx = 4, pady = 4, sticky 
 password_radiobutton.invoke()
 ssh_radiobutton.invoke()
 
-trust_button = Checkbutton(main, text = 'Establish trust between the servers.', variable = trust, onvalue = True, offvalue = False)
 trust_button.grid(row = 17, column = 0, padx = 4, pady = 4, sticky = 'w')
 trust_old_button = Radiobutton(main, text = 'Use existing key-pair to establish trust\nbetween the source and the target.', variable = trust_key, value = 'old')
 trust_old_button.grid(row = 18, column = 0, padx = 4, pady = 4, sticky = 'w')

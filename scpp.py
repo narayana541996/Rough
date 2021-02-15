@@ -40,7 +40,7 @@ def scp(source_ssh_file, source_username, source_host, target_ssh_file, copy_fil
             client.connect(hostname = hostname, username = username, port = 22, pkey = key)
         except paramiko.AuthenticationException:
             try:
-                print('ssh_file: ',ssh_file)
+                print('ssh_file: ',ssh_file)#############CHECK OTHER KINDS OF KEYS IF THEY'RE WORKING.
                 os.chmod(os.path.expanduser('~/.ssh'), 0o700)
                 os.chmod(ssh_file, 0o600)
                 #run(['chmod','0644', ssh_file])#cannot find file
@@ -99,4 +99,4 @@ def scp(source_ssh_file, source_username, source_host, target_ssh_file, copy_fil
     ssh_source.close()
     ssh_target.close()
 if __name__ == '__main__':
-    scp(source_ssh_file = r'C:/Users/krish/.ssh/inst-trial-3.pem', source_username ='ubuntu', source_host = '65.0.21.194', source_password = '', target_ssh_file = r'C:/Users/krish/Downloads/inst-trial-3.pem', copy_filepath = '/home/ubuntu/upload_test', target_username = 'ubuntu', target_host = '13.234.67.38', target_directory_path = '~/', recursive = True, target_password = '')
+    scp(source_ssh_file = r'C:/Users/krish/Downloads/inst-trial-3.pem', source_username ='ubuntu', source_host = '65.1.134.158', source_password = '', target_ssh_file = r'C:/Users/krish/Downloads/inst-trial-3.pem', copy_filepath = '/home/ubuntu/upload_test', target_username = 'ubuntu', target_host = '13.126.136.188', target_directory_path = '~/', recursive = True, target_password = '', connect_target_key_file = '~/.ssh/id_dsa')
