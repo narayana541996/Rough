@@ -6,7 +6,7 @@ from tkinter.ttk import *
 from ttkthemes import *
 #########Remove the entry to select file name of the new_key to establish trust.
 def local_scp(source_ssh_file_entry, source_username_entry, source_hostname_entry, target_ssh_file_entry, copy_filepath_entry, target_username_entry, target_hostname_entry, target_folderpath_entry, recursive, trust, connect_target_key_file_entry, create_key_bits = 1024):
-    response = scpp.scp(source_ssh_file = source_ssh_file_entry.get().strip().replace('\\','/'), source_username = source_username_entry.get().strip().replace('\\','/'), source_host = source_hostname_entry.get().strip().replace('\\','/'), target_ssh_file = target_ssh_file_entry.get().strip().replace('\\','/'), copy_filepath = copy_filepath_entry.get().strip().replace('\\','/'), target_username = target_username_entry.get().strip().replace('\\','/'), target_host = target_hostname_entry.get().strip().replace('\\','/'), target_directory_path = target_folderpath_entry.get().strip().replace('\\','/'), recursive = recursive.get(), establish_trust = trust, create_key_bits = create_key_bits, connect_target_key_file = connect_target_key_file_entry.get().strip().replace('\\', '/'))
+    response = scpp.scp_(source_ssh_file = source_ssh_file_entry.get().strip().replace('\\','/'), source_username = source_username_entry.get().strip().replace('\\','/'), source_host = source_hostname_entry.get().strip().replace('\\','/'), target_ssh_file = target_ssh_file_entry.get().strip().replace('\\','/'), copy_filepath = copy_filepath_entry.get().strip().replace('\\','/'), target_username = target_username_entry.get().strip().replace('\\','/'), target_host = target_hostname_entry.get().strip().replace('\\','/'), target_directory_path = target_folderpath_entry.get().strip().replace('\\','/'), recursive = recursive.get(), establish_trust = trust, create_key_bits = create_key_bits, connect_target_key_file = connect_target_key_file_entry.get().strip().replace('\\', '/'))
     #if f'Established Trust between {source_username_entry.get().strip().replace("\\","/")}@{source_hostname_entry.get().strip().replace("\\","/")} and {target_username.get().strip().replace("\\","/")}@{target_host.get().strip().replace("\\","/")}' in response and f'Copied {copy_filepath_entry.get().split().replace("\\","/")} from {source_username_entry.get().strip().replace("\\","/")}@{source_hostname_entry.get().strip().replace("\\","/")} to {target_username_entry.get().strip().replace("\\","/")}@{target_hostname_entry.get().strip().replace("\\","/")}' in response:
     message = show_message(message_box = showinfo, message = response)
 
@@ -75,7 +75,7 @@ target_folderpath_entry.grid(row = 8, column = 1, padx = 4, pady = 4, sticky = '
 ###add print statements to check the cause of the empty string
 #####Include entry for target_ssh_password and source_ssh_password.
 
-trust_button = Checkbutton(main, text = 'Establish trust between the servers.', variable = trust, onvalue = True, offvalue = False)
+trust_button = Checkbutton(main, text = 'Establish trust between the servers with a key-pair.', variable = trust, onvalue = True, offvalue = False)
 
 password_radiobutton = Radiobutton(main, text = 'Access with Password ', variable = authentication, value = 'password', command = lambda: set_mode(disabled = (source_ssh_file_label, source_ssh_file_entry, source_ssh_password_label, source_ssh_password_entry, target_ssh_file_label, target_ssh_file_entry, target_ssh_password_label, target_ssh_password_entry, trust_button), normal = (source_password_label, source_password_entry, target_password_label, target_password_entry)))
 password_radiobutton.grid(row = 9, column = 0, padx = 4, pady = 4, sticky = 'w')
@@ -100,11 +100,11 @@ source_ssh_password_label.grid(row = 15, column = 0, padx = 4, pady = 4, sticky 
 source_ssh_password_entry = Entry(main, show = '*', width = 50)
 source_ssh_password_entry.grid(row = 16, column = 0, padx = 4, pady = 4, sticky = 'w')
 
-target_ssh_file_label = Label(main, text = 'Target SSH Key-File Path: ')
+target_ssh_file_label = Label(main, text = 'Target SSH Key-File Path: ')#####Ask user if ssh file for target exists on source
 target_ssh_file_label.grid(row = 13, column = 1, padx = 4, pady = 4, sticky = 'w')
 target_ssh_file_entry = Entry(main, width = 50)
 target_ssh_file_entry.grid(row = 14, column = 1, padx = 4, pady = 4, sticky = 'w')
-target_ssh_password_label = Label(main, text = 'Target SSH Key-File Password(if required): ')
+target_ssh_password_label = Label(main, text = 'Target SSH Key-File Password(if required): ')###Pass ssh-file password with ssh-copy-id
 target_ssh_password_label.grid(row = 15, column = 1, padx = 4, pady = 4, sticky = 'w')
 target_ssh_password_entry = Entry(main, show = '*', width = 50)
 target_ssh_password_entry.grid(row = 16, column = 1, padx = 4, pady = 4, sticky = 'w')
@@ -121,7 +121,7 @@ trust_button.grid(row = 17, column = 0, padx = 4, pady = 4, sticky = 'w')
 #connect_target_key_file_entry.grid(row = 20, column = 0, padx = 4, pady = 4, sticky = 'w')
 #trust_new_button = Radiobutton(main, text = 'Create new key-pair to establish trust\nbetween the source and the target.', variable = trust_key, value = 'new')
 #trust_new_button.grid(row = 18, column = 1, padx = 4, pady = 4, sticky = 'w')
-trust_button.configure(command = lambda: set_trust_mode(checkbutton = trust_button, trust = trust, items = (trust_old_button, trust_new_button)))
+#trust_button.configure(command = lambda: set_trust_mode(checkbutton = trust_button, trust = trust, items = (trust_old_button, trust_new_button)))
 #trust_old_button.configure(command = lambda: set_mode(normal = (connect_target_key_file_label, connect_target_key_file_entry), disabled = ()), state = 'disabled')
 #trust_new_button.configure(command = lambda: set_mode(disabled = (connect_target_key_file_label, connect_target_key_file_entry), normal = ()), state = 'disabled')
 
