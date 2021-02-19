@@ -7,7 +7,7 @@ from subprocess import *
 from datetime import datetime
 
 response = ''
-def scp_(source_ssh_file, source_username, source_host, target_ssh_file, copy_filepath, target_username, target_host, target_directory_path, recursive, establish_trust = True, source_password = '', target_password = '', connect_target_key_file = '', create_key_bits = '1024'):
+def scp_(source_ssh_file, source_username, source_host, target_ssh_file, copy_filepath, target_username, target_host, target_directory_path, recursive, establish_trust = True, source_password = '', target_password = '', target_key_file_on_source = '', create_key_bits = '1024'):
     filename = copy_filepath.split('/')[-1]
     global response
     def scp_to(scp_client, target_directory_path, recursive, files = filename):
@@ -98,24 +98,26 @@ def scp_(source_ssh_file, source_username, source_host, target_ssh_file, copy_fi
                                 ####proceed to establish trust, else, show that trust is already established. 
                 #####If trust is not yet established, try connecting with an existing key, to the target. If it gives no output,
                 ####create a new key-pair and copy the new public key to target's authorized_keys.
-                stdin1, stdout1, stderr1 = ssh_source.exec_command(f'ssh-copy-id -f -o "IdentityFile ~/.ssh/{target_ssh_file.split("/")[-1]}" -i ~/.ssh/{connect_target_key_file} {target_username}@{target_host}')
-                print('old stdout1: ',stdout1.read(),' stderr1: ',stderr1.read())
-                if not stdout1.read() and ('error' not in str(stdout1.read()).lower()):
-                    create_key_filename = generate_key(target_username, target_host, ssh_source, create_key_bits)
-                    print('create_key_filename: ',create_key_filename)
+                #stdin1, stdout1, stderr1 = ssh_source.exec_command(f'ssh-copy-id -f -o "IdentityFile ~/.ssh/{target_ssh_file.split("/")[-1]}" -i ~/.ssh/{target_key_file_on_source} {target_username}@{target_host}')
+                #print('old stdout1: ',stdout1.read(),' stderr1: ',stderr1.read())
+                #if not stdout1.read() and ('error' not in str(stdout1.read()).lower()):
+                create_key_filename = generate_key(target_username, target_host, ssh_source, create_key_bits)
+                print('create_key_filename: ',create_key_filename)
+                if not target_key_file_on_source:
                     scp_to(scp_client = source_scp_client, target_directory_path = '~/.ssh', recursive = recursive, files = target_ssh_file)
                     target_filename = target_ssh_file.split("/")[-1]
                     chin, chout, cherr = ssh_source.exec_command(f'chmod 0600 ~/.ssh/{target_filename}')
                     print('chout: ',chout.read(),' cherr: ',cherr.read())
                     stdin1, stdout1, stderr1 = ssh_source.exec_command(f'ssh-copy-id -f -o "IdentityFile ~/.ssh/{target_filename}" -i ~/.ssh/{create_key_filename} {target_username}@{target_host}')
-                    print('new stdout1: ',stdout1.read(),' stderr1: ',stderr1.read())
-                    chin2, chout2, cherr2 = ssh_source.exec_command(f'chmod 0700 ~/.ssh')
-                    print('chout2: ',chout2.read(),' cherr2: ',cherr2.read())
-                    #rmin, rmout, rmerr = ssh_source.exec_command(f'rm ~/.ssh/{target_filename}')
-                    #print('rmout: ',rmout.read(),' rmerr: ',rmerr.read())
-                    stdin2, stdout2, stderr2 = ssh_source.exec_command(f'ssh {target_username}@{target_host}')
-                    print('stdout2: ', stdout2.read(),' stderr2: ', stderr2.read())
-                print('Establishing trust...')
+                else:
+                    stdin1, stdout1, stderr1 = ssh_source.exec_command(f'ssh-copy-id -f -o "IdentityFile {target_key_file_on_source}" -i ~/.ssh/{create_key_filename} {target_username}@{target_host}')
+                print('new stdout1: ',stdout1.read(),' stderr1: ',stderr1.read())
+                chin2, chout2, cherr2 = ssh_source.exec_command(f'chmod 0700 ~/.ssh')
+                print('chout2: ',chout2.read(),' cherr2: ',cherr2.read())
+                rmin, rmout, rmerr = ssh_source.exec_command(f'rm ~/.ssh/{target_filename}')
+                print('rmout: ',rmout.read(),' rmerr: ',rmerr.read())
+                stdin2, stdout2, stderr2 = ssh_source.exec_command(f'ssh {target_username}@{target_host}')
+                print('stdout2: ', stdout2.read(),' stderr2: ', stderr2.read())
                 if stdout2.read() and ('error' not in str(stdout2.read()).lower()):
                     response = f'{response}\nEstablished Trust between {source_username}@{source_host} and {target_username}@{target_host}.'
                 elif 'permission denied (publickey)' in str(stdout2.read()).lower() or ('permission denied (publickey)' in str(stderr2.read().lower())):
@@ -137,4 +139,4 @@ def scp_(source_ssh_file, source_username, source_host, target_ssh_file, copy_fi
         ssh_target.close()
     return response
 if __name__ == '__main__':
-    scp_(source_ssh_file = r'C:/Users/krish/Downloads/inst-trial-3.pem', source_username ='ubuntu', source_host = '13.234.67.131', source_password = '', target_ssh_file = r'C:/Users/krish/Downloads/inst-trial-3.pem', copy_filepath = '/home/ubuntu/upload_test', target_username = 'ubuntu', target_host = '65.1.107.11', target_directory_path = '~/', recursive = False, target_password = '', connect_target_key_file = '~/.ssh/id_dsa')
+    scp_(source_ssh_file = r'C:/Users/krish/Downloads/inst-trial-3.pem', source_username ='ubuntu', source_host = '13.233.78.252', source_password = '', target_ssh_file = r'C:/Users/krish/Downloads/inst-trial-3.pem', copy_filepath = '/home/ubuntu/upload_test', target_username = 'ubuntu', target_host = '13.126.189.138', target_directory_path = '~/', recursive = False, target_password = '', target_key_file_on_source = '~/.ssh/id_dsa')
