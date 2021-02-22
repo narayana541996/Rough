@@ -33,26 +33,21 @@ def set_auth(authentication, trust, *args, **kwargs):
     set_mode(normal = normal, disabled = disabled)
 
 def set_target_key_file_on_source(trust, authentication, *args, **kwargs):
-    if trust.get():
-        if authentication.get() == 'ssh' and not target_ssh_password_entry.get().split() and target_ssh_file_entry.get().split():
-            normal = [target_key_file_on_source_button, copy_target_key_button, target_key_file_on_source_label, target_key_file_on_source_entry]
-            disabled = []
-        else:
+    if trust.get():            
+        if (authentication.get() == 'password' or target_ssh_password_entry.get().split()) and not target_ssh_file_entry.get().split():
             normal = [target_key_file_on_source_button, target_key_file_on_source_label, target_key_file_on_source_entry]
             disabled = [copy_target_key_button]
+        else:
+            normal = [target_key_file_on_source_button, copy_target_key_button, target_key_file_on_source_label, target_key_file_on_source_entry]
+            disabled = []
     else:
         normal = []
         disabled = [target_key_file_on_source_button, copy_target_key_button, target_key_file_on_source_label, target_key_file_on_source_entry]
     set_mode(disabled = disabled, normal = normal)
 
 def target_ssh_password_entry_binding(authentication, trust, *args, **kwargs):
-    if authentication.get() == 'ssh' and not target_ssh_password_entry.get().split() and target_ssh_file_entry.get().split():
-        normal = [copy_target_key_button]
-        disabled = []
-    else:
-        normal = []
-        disabled = [copy_target_key_button]
-    set_mode(normal = normal, disabled = disabled)
+    if (authentication.get() == 'password' or target_ssh_password_entry.get().split()) and not target_ssh_file_entry.get().split():
+        set_mode(normal = [], disabled = [copy_target_key_button])
 
 root = Tk()
 main = Frame(root)
@@ -137,6 +132,7 @@ target_ssh_password_entry = Entry(main, show = '*', width = 50)
 target_ssh_password_entry.grid(row = 16, column = 1, padx = 4, pady = 4, sticky = 'w')
 
 target_ssh_password_entry.bind('<KeyPress>', lambda event: target_ssh_password_entry_binding(authentication, trust, copy_target_key_button))
+target_ssh_password_entry.bind('<KeyRelease>', lambda event: target_ssh_password_entry_binding(authentication, trust, copy_target_key_button))
 
 password_radiobutton.invoke()
 ssh_radiobutton.invoke()

@@ -90,7 +90,10 @@ def scp_(source_ssh_file, source_username, source_host, target_ssh_file, copy_fi
         scp_from(source_scp_client, copy_filepath, recursive)
         target_scp_client = SCPClient(ssh_target.get_transport())
         scp_to(target_scp_client, target_directory_path, recursive)
-        response = f'Copied {copy_filepath} from {source_username}@{source_host} to {target_username}@{target_host}.\n{response}'
+        if 'doesn\'t look like some regular file(s)'not in response:
+            response = f'Copied {copy_filepath} from {source_username}@{source_host} to {target_username}@{target_host}.\n{response}'
+        else:
+            return response
         if establish_trust:######if establish_trust is true, try to establish trust, else, skip establishing trust.
             stdin2, stdout2, stderr2 = ssh_source.exec_command(f'ssh {target_username}@{target_host}')
             print('stdout2: ',stdout2.read(),' stderr2: ',stderr2.read())
@@ -103,6 +106,7 @@ def scp_(source_ssh_file, source_username, source_host, target_ssh_file, copy_fi
                 #if not stdout1.read() and ('error' not in str(stdout1.read()).lower()):
                 create_key_filename = generate_key(target_username, target_host, ssh_source, create_key_bits)
                 print('create_key_filename: ',create_key_filename)
+                target_filename = ''
                 if not target_key_file_on_source:
                     scp_to(scp_client = source_scp_client, target_directory_path = '~/.ssh', recursive = recursive, files = target_ssh_file)
                     target_filename = target_ssh_file.split("/")[-1]
@@ -114,8 +118,9 @@ def scp_(source_ssh_file, source_username, source_host, target_ssh_file, copy_fi
                 print('new stdout1: ',stdout1.read(),' stderr1: ',stderr1.read())
                 chin2, chout2, cherr2 = ssh_source.exec_command(f'chmod 0700 ~/.ssh')
                 print('chout2: ',chout2.read(),' cherr2: ',cherr2.read())
-                rmin, rmout, rmerr = ssh_source.exec_command(f'rm ~/.ssh/{target_filename}')
-                print('rmout: ',rmout.read(),' rmerr: ',rmerr.read())
+                if target_filename:
+                    rmin, rmout, rmerr = ssh_source.exec_command(f'rm ~/.ssh/{target_filename}')
+                    print('rmout: ',rmout.read(),' rmerr: ',rmerr.read())
                 stdin2, stdout2, stderr2 = ssh_source.exec_command(f'ssh {target_username}@{target_host}')
                 print('stdout2: ', stdout2.read(),' stderr2: ', stderr2.read())
                 if stdout2.read() and ('error' not in str(stdout2.read()).lower()):
@@ -139,4 +144,4 @@ def scp_(source_ssh_file, source_username, source_host, target_ssh_file, copy_fi
         ssh_target.close()
     return response
 if __name__ == '__main__':
-    scp_(source_ssh_file = r'C:/Users/krish/Downloads/inst-trial-3.pem', source_username ='ubuntu', source_host = '13.233.78.252', source_password = '', target_ssh_file = r'C:/Users/krish/Downloads/inst-trial-3.pem', copy_filepath = '/home/ubuntu/upload_test', target_username = 'ubuntu', target_host = '13.126.189.138', target_directory_path = '~/', recursive = False, target_password = '', target_key_file_on_source = '~/.ssh/id_dsa')
+    scp_(source_ssh_file = r'C:/Users/krish/Downloads/inst-trial-3.pem', source_username ='ubuntu', source_host = '65.1.93.83', source_password = '', target_ssh_file = r'C:/Users/krish/Downloads/inst-trial-3.pem', copy_filepath = '/home/ubuntu/upload_test', target_username = 'ubuntu', target_host = '13.233.47.49', target_directory_path = '~/', recursive = False, target_password = '', target_key_file_on_source = '~/.ssh/id_dsa')
