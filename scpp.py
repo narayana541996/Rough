@@ -5,6 +5,7 @@ import os
 import shutil
 from subprocess import *
 from datetime import datetime
+import logging
 
 response = ''
 def scp_(source_ssh_file, source_username, source_host, target_ssh_file, copy_filepath, target_username, target_host, target_directory_path, recursive, establish_trust = True, source_password = '', target_password = '', target_key_file_on_source = '', create_key_bits = '1024'):
@@ -90,7 +91,7 @@ def scp_(source_ssh_file, source_username, source_host, target_ssh_file, copy_fi
         scp_from(source_scp_client, copy_filepath, recursive)
         target_scp_client = SCPClient(ssh_target.get_transport())
         scp_to(target_scp_client, target_directory_path, recursive)
-        if 'doesn\'t look like some regular file(s)'not in response:
+        if 'doesn\'t look like some regular file(s)'not in response and 'Cannot find the file to be copied' not in response:
             response = f'Copied {copy_filepath} from {source_username}@{source_host} to {target_username}@{target_host}.\n{response}'
         else:
             return response
@@ -144,4 +145,4 @@ def scp_(source_ssh_file, source_username, source_host, target_ssh_file, copy_fi
         ssh_target.close()
     return response
 if __name__ == '__main__':
-    scp_(source_ssh_file = r'C:/Users/krish/Downloads/inst-trial-3.pem', source_username ='ubuntu', source_host = '65.1.93.83', source_password = '', target_ssh_file = r'C:/Users/krish/Downloads/inst-trial-3.pem', copy_filepath = '/home/ubuntu/upload_test', target_username = 'ubuntu', target_host = '13.233.47.49', target_directory_path = '~/', recursive = False, target_password = '', target_key_file_on_source = '~/.ssh/id_dsa')
+    scp_(source_ssh_file = r'C:/Users/krish/Downloads/inst-trial-3.pem', source_username ='ubuntu', source_host = '65.1.93.83', source_password = '', target_ssh_file = r'C:/Users/krish/Downloads/inst-trial-3.pem', copy_filepath = '/home/ubuntu/upload_test', target_username = 'ubuntu', target_host = '13.233.47.49', target_directory_path = '~/', recursive = True, target_password = '', target_key_file_on_source = '~/.ssh/id_dsa')
