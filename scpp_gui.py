@@ -19,14 +19,40 @@ def set_mode(disabled, normal, *args, **kwargs):
     for item in normal:
         item['state'] = 'normal'
 
-def set_target_key_file_on_source(trust, items, *args, **kwargs):
-    if trust.get():
-        normal = items
-        disabled = ()
+def set_auth(authentication, trust, *args, **kwargs):
+    if authentication.get() == 'ssh':
+        if trust.get() and target_ssh_password_entry.get().split():
+            normal = [source_ssh_file_label, source_ssh_file_entry, source_ssh_password_label, source_ssh_password_entry, target_ssh_file_label, target_ssh_file_entry, target_ssh_password_label, target_ssh_password_entry, trust_button]
+            disabled = [copy_target_key_button, source_password_label, source_password_entry, target_password_label, target_password_entry]
+        else:
+            normal = [source_ssh_file_label, source_ssh_file_entry, source_ssh_password_label, source_ssh_password_entry, target_ssh_file_label, target_ssh_file_entry, target_ssh_password_label, target_ssh_password_entry, trust_button]
+            disabled = [source_password_label, source_password_entry, target_password_label, target_password_entry]
     else:
-        normal = ()
-        disabled = items
+        normal = [source_password_label, source_password_entry, target_password_label, target_password_entry]
+        disabled = [source_ssh_file_label, source_ssh_file_entry, source_ssh_password_label, source_ssh_password_entry, target_ssh_file_label, target_ssh_file_entry, target_ssh_password_label, target_ssh_password_entry, copy_target_key_button]
+    set_mode(normal = normal, disabled = disabled)
+
+def set_target_key_file_on_source(trust, authentication, *args, **kwargs):
+    if trust.get():
+        if authentication.get() == 'ssh' and not target_ssh_password_entry.get().split() and target_ssh_file_entry.get().split():
+            normal = [target_key_file_on_source_button, copy_target_key_button, target_key_file_on_source_label, target_key_file_on_source_entry]
+            disabled = []
+        else:
+            normal = [target_key_file_on_source_button, target_key_file_on_source_label, target_key_file_on_source_entry]
+            disabled = [copy_target_key_button]
+    else:
+        normal = []
+        disabled = [target_key_file_on_source_button, copy_target_key_button, target_key_file_on_source_label, target_key_file_on_source_entry]
     set_mode(disabled = disabled, normal = normal)
+
+def target_ssh_password_entry_binding(authentication, trust, *args, **kwargs):
+    if authentication.get() == 'ssh' and not target_ssh_password_entry.get().split() and target_ssh_file_entry.get().split():
+        normal = [copy_target_key_button]
+        disabled = []
+    else:
+        normal = []
+        disabled = [copy_target_key_button]
+    set_mode(normal = normal, disabled = disabled)
 
 root = Tk()
 main = Frame(root)
@@ -78,7 +104,7 @@ target_folderpath_entry.grid(row = 8, column = 1, padx = 4, pady = 4, sticky = '
 trust_button = Checkbutton(main, text = 'Establish trust between the servers with a key-pair.', variable = trust, onvalue = True, offvalue = False)
 
 copy_target_key_button = Radiobutton(main, text = 'Copy the key given in the \'Target SSH Key File Path\' to source,\nto establish trust with the target.', variable = target_key_file_on_source, value = False)
-password_radiobutton = Radiobutton(main, text = 'Access with Password ', variable = authentication, value = 'password', command = lambda: set_mode(disabled = (source_ssh_file_label, source_ssh_file_entry, source_ssh_password_label, source_ssh_password_entry, target_ssh_file_label, target_ssh_file_entry, target_ssh_password_label, target_ssh_password_entry, copy_target_key_button), normal = (source_password_label, source_password_entry, target_password_label, target_password_entry)))
+password_radiobutton = Radiobutton(main, text = 'Access with Password ', variable = authentication, value = 'password', command = lambda: set_auth(authentication, trust, source_ssh_file_label, source_ssh_file_entry, source_ssh_password_label, source_ssh_password_entry, target_ssh_file_label, target_ssh_file_entry, target_ssh_password_label, target_ssh_password_entry, copy_target_key_button, source_password_label, source_password_entry, target_password_label, target_password_entry))
 password_radiobutton.grid(row = 9, column = 0, padx = 4, pady = 4, sticky = 'w')
 source_password_label = Label(main, text = 'Source Password: ')
 source_password_label.grid(row = 10, column = 0, padx = 4, pady = 4, sticky = 'w')
@@ -90,7 +116,7 @@ target_password_label.grid(row = 10, column = 1, padx = 4, pady = 4, sticky = 'w
 target_password_entry = Entry(main, width = 50)
 target_password_entry.grid(row = 11, column = 1, padx = 4, pady = 4, sticky = 'w')
 
-ssh_radiobutton = Radiobutton(main, text = 'Access with SSH', variable = authentication, value = 'ssh', command = lambda: set_mode(normal = (source_ssh_file_label, source_ssh_file_entry, source_ssh_password_label, source_ssh_password_entry, target_ssh_file_label, target_ssh_file_entry, target_ssh_password_label, target_ssh_password_entry, trust_button), disabled = (source_password_label, source_password_entry, target_password_label, target_password_entry)))
+ssh_radiobutton = Radiobutton(main, text = 'Access with SSH', variable = authentication, value = 'ssh', command = lambda: set_auth(authentication, trust, source_ssh_file_label, source_ssh_file_entry, source_ssh_password_label, source_ssh_password_entry, target_ssh_file_label, target_ssh_file_entry, target_ssh_password_label, target_ssh_password_entry, trust_button, source_password_label, source_password_entry, target_password_label, target_password_entry))
 ssh_radiobutton.grid(row = 12, column = 0, padx = 4, pady = 4, sticky = 'w')
 source_ssh_file_label = Label(main, text = 'Source SSH Key File Path: ')
 source_ssh_file_label.grid(row = 13, column = 0, padx = 4, pady = 4, sticky = 'w')
@@ -110,10 +136,12 @@ target_ssh_password_label.grid(row = 15, column = 1, padx = 4, pady = 4, sticky 
 target_ssh_password_entry = Entry(main, show = '*', width = 50)
 target_ssh_password_entry.grid(row = 16, column = 1, padx = 4, pady = 4, sticky = 'w')
 
+target_ssh_password_entry.bind('<KeyPress>', lambda event: target_ssh_password_entry_binding(authentication, trust, copy_target_key_button))
+
 password_radiobutton.invoke()
 ssh_radiobutton.invoke()
 
-trust_button.grid(row = 17, column = 0, padx = 4, pady = 4, sticky = 'w')###If ssh key file has password, disable.
+trust_button.grid(row = 17, column = 0, padx = 4, pady = 4, sticky = 'w')###If ssh key file has password, disable COPY OPTION.
 target_key_file_on_source_button = Radiobutton(main, text = 'Use target\'s key on the source to establish trust\nbetween the source and the target.', variable = target_key_file_on_source, value = True)
 target_key_file_on_source_button.grid(row = 18, column = 0, padx = 4, pady = 4, sticky = 'w')
 target_key_file_on_source_label = Label(main, text = 'Enter the path of the key-pair on the source to establish trust: ', state = 'disabled')
@@ -122,7 +150,7 @@ target_key_file_on_source_entry = Entry(main, width = 50, state = 'disabled')
 target_key_file_on_source_entry.grid(row = 20, column = 0, padx = 4, pady = 4, sticky = 'w')
 
 copy_target_key_button.grid(row = 18, column = 1, padx = 4, pady = 4, sticky = 'w')
-trust_button.configure(command = lambda: set_target_key_file_on_source(checkbutton = trust_button, trust = trust, items = (target_key_file_on_source_button, copy_target_key_button, target_key_file_on_source_label, target_key_file_on_source_entry)))
+trust_button.configure(command = lambda: set_target_key_file_on_source(trust, authentication, target_key_file_on_source_button, copy_target_key_button, target_key_file_on_source_label, target_key_file_on_source_entry))
 target_key_file_on_source_button.configure(command = lambda: set_mode(normal = (target_key_file_on_source_label, target_key_file_on_source_entry), disabled = ()), state = 'disabled')
 copy_target_key_button.configure(command = lambda: set_mode(disabled = (target_key_file_on_source_label, target_key_file_on_source_entry), normal = ()), state = 'disabled')
 
