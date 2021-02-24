@@ -7,8 +7,16 @@ from ttkthemes import *
 #########Remove the entry to select file name of the new_key to establish trust.
 def local_scp(source_ssh_file_entry, source_username_entry, source_hostname_entry, target_ssh_file_entry, copy_filepath_entry, target_username_entry, target_hostname_entry, target_folderpath_entry, recursive, trust, target_key_file_on_source_entry, create_key_bits = 1024):
     response = scpp.scp_(source_ssh_file = source_ssh_file_entry.get().strip().replace('\\','/'), source_username = source_username_entry.get().strip().replace('\\','/'), source_host = source_hostname_entry.get().strip().replace('\\','/'), target_ssh_file = target_ssh_file_entry.get().strip().replace('\\','/'), copy_filepath = copy_filepath_entry.get().strip().replace('\\','/'), target_username = target_username_entry.get().strip().replace('\\','/'), target_host = target_hostname_entry.get().strip().replace('\\','/'), target_directory_path = target_folderpath_entry.get().strip().replace('\\','/'), recursive = recursive.get(), establish_trust = trust, create_key_bits = create_key_bits, target_key_file_on_source = target_key_file_on_source_entry.get().strip().replace('\\', '/'))
-    #if f'Established Trust between {source_username_entry.get().strip().replace("\\","/")}@{source_hostname_entry.get().strip().replace("\\","/")} and {target_username.get().strip().replace("\\","/")}@{target_host.get().strip().replace("\\","/")}' in response and f'Copied {copy_filepath_entry.get().split().replace("\\","/")} from {source_username_entry.get().strip().replace("\\","/")}@{source_hostname_entry.get().strip().replace("\\","/")} to {target_username_entry.get().strip().replace("\\","/")}@{target_hostname_entry.get().strip().replace("\\","/")}' in response:
-    message = show_message(message_box = showinfo, message = response)
+    
+    if 'Do you wish to turn on recursion?' in response:
+        message = show_message(message_box = askyesno, message = response)
+        if message == 'yes':
+            local_scp(source_ssh_file_entry, source_username_entry, source_hostname_entry, target_ssh_file_entry, copy_filepath_entry, target_username_entry, target_hostname_entry, target_folderpath_entry, trust, target_key_file_on_source_entry, create_key_bits, recursive = True)
+    elif 'copied' in response.lower():
+        message = show_message(message_box = showinfo, message = response)
+    else:
+        message = show_message(message_box = showerror, message = response)
+        
 
 def show_message(message_box, message):
     return message_box(title = 'Response', message = message)
