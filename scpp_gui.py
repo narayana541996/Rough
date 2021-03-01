@@ -6,7 +6,8 @@ from tkinter.ttk import *
 from ttkthemes import *
 #########Remove the entry to select file name of the new_key to establish trust.
 def local_scp(source_ssh_file_entry, source_username_entry, source_hostname_entry, target_ssh_file_entry, copy_filepath_entry, target_username_entry, target_hostname_entry, target_folderpath_entry, recursive, trust, target_key_file_on_source_entry, create_key_bits = 1024):
-    response = scpp.scp_(source_ssh_file = source_ssh_file_entry.get().strip().replace('\\','/'), source_username = source_username_entry.get().strip().replace('\\','/'), source_host = source_hostname_entry.get().strip().replace('\\','/'), target_ssh_file = target_ssh_file_entry.get().strip().replace('\\','/'), copy_filepath = copy_filepath_entry.get().strip().replace('\\','/'), target_username = target_username_entry.get().strip().replace('\\','/'), target_host = target_hostname_entry.get().strip().replace('\\','/'), target_directory_path = target_folderpath_entry.get().strip().replace('\\','/'), recursive = recursive.get(), establish_trust = trust, create_key_bits = create_key_bits, target_key_file_on_source = target_key_file_on_source_entry.get().strip().replace('\\', '/'))
+    #print('local trust: ',trust,' trust.get: ', trust.get())
+    response = scpp.scp_(source_ssh_file = source_ssh_file_entry.get().strip().replace('\\','/'), source_username = source_username_entry.get().strip().replace('\\','/'), source_host = source_hostname_entry.get().strip().replace('\\','/'), target_ssh_file = target_ssh_file_entry.get().strip().replace('\\','/'), copy_filepath = copy_filepath_entry.get().strip().replace('\\','/'), target_username = target_username_entry.get().strip().replace('\\','/'), target_host = target_hostname_entry.get().strip().replace('\\','/'), target_directory_path = target_folderpath_entry.get().strip().replace('\\','/'), recursive = recursive.get(), establish_trust = trust.get(), create_key_bits = create_key_bits, target_key_file_on_source = target_key_file_on_source_entry.get().strip().replace('\\', '/'))
     
     if 'Do you wish to turn on recursion?' in response:
         message = show_message(message_box = askyesno, message = response)
@@ -54,8 +55,18 @@ def set_target_key_file_on_source(trust, authentication, *args, **kwargs):
     set_mode(disabled = disabled, normal = normal)
 
 def target_ssh_password_entry_binding(authentication, trust, *args, **kwargs):
-    if (authentication.get() == 'password' or target_ssh_password_entry.get().split()) and not target_ssh_file_entry.get().split():
+    if trust.get():
+        if (authentication.get() == 'password' or target_ssh_password_entry.get().split()) and not target_ssh_file_entry.get().split():
+            set_mode(normal = [], disabled = [copy_target_key_button])
+        else:
+            set_mode(normal = [copy_target_key_button], disabled = [])
+    else:
         set_mode(normal = [], disabled = [copy_target_key_button])
+
+def target_ssh_file_entry_binding(authentication, trust, *args, **kwargs):
+    #if (authentication.get() == 'password' or target_ssh_password_entry.get().split()) and not target_ssh_file_entry.get().split():
+     #   set_mode(normal = [], disabled = [copy_target_key_button])
+     target_ssh_password_entry_binding(authentication, trust, *args, **kwargs)
 
 root = Tk()
 main = Frame(root)
@@ -141,6 +152,8 @@ target_ssh_password_entry.grid(row = 16, column = 1, padx = 4, pady = 4, sticky 
 
 target_ssh_password_entry.bind('<KeyPress>', lambda event: target_ssh_password_entry_binding(authentication, trust, copy_target_key_button))
 target_ssh_password_entry.bind('<KeyRelease>', lambda event: target_ssh_password_entry_binding(authentication, trust, copy_target_key_button))
+target_ssh_file_entry.bind('<KeyPress>', lambda event: target_ssh_file_entry_binding(authentication, trust, copy_target_key_button))
+target_ssh_file_entry.bind('<KeyRelease>', lambda event: target_ssh_file_entry_binding(authentication, trust, copy_target_key_button))
 
 password_radiobutton.invoke()
 ssh_radiobutton.invoke()
@@ -160,6 +173,6 @@ copy_target_key_button.configure(command = lambda: set_mode(disabled = (target_k
 
 recursive_checkbutton = Checkbutton(main, text = 'Recursive', variable = recursive, onvalue = True, offvalue = False)
 recursive_checkbutton.grid(row = 21, column = 0, padx = 4, pady = 4, columnspan = 2, sticky = 'w')
-copy_button = Button(main, text = 'Copy', command = lambda source_ssh_file_entry = source_ssh_file_entry, source_username_entry = source_username_entry, source_hostname_entry = source_hostname_entry, target_ssh_file_entry = target_ssh_file_entry, copy_filepath_entry = copy_filepath_entry, target_username_entry = target_username_entry, target_hostname_entry = target_hostname_entry, target_folderpath_entry = target_folderpath_entry, recursive = recursive, source_password = source_ssh_password_entry, target_password = target_ssh_password_entry: threading.Thread(target = local_scp, args = (source_ssh_file_entry, source_username_entry, source_hostname_entry, target_ssh_file_entry, copy_filepath_entry, target_username_entry, target_hostname_entry, target_folderpath_entry, recursive, source_password, target_password)).start())
+copy_button = Button(main, text = 'Copy', command = lambda source_ssh_file_entry = source_ssh_file_entry, source_username_entry = source_username_entry, source_hostname_entry = source_hostname_entry, target_ssh_file_entry = target_ssh_file_entry, copy_filepath_entry = copy_filepath_entry, target_username_entry = target_username_entry, target_hostname_entry = target_hostname_entry, target_folderpath_entry = target_folderpath_entry, recursive = recursive, trust = trust, target_key_file_on_source_entry = target_key_file_on_source_entry, source_password = source_ssh_password_entry, target_password = target_ssh_password_entry: threading.Thread(target = local_scp, kwargs = {'source_ssh_file_entry' : source_ssh_file_entry, 'source_username_entry' : source_username_entry, 'source_hostname_entry' : source_hostname_entry, 'target_ssh_file_entry' : target_ssh_file_entry, 'copy_filepath_entry' : copy_filepath_entry, 'target_username_entry' : target_username_entry, 'target_hostname_entry' : target_hostname_entry, 'target_folderpath_entry' : target_folderpath_entry, 'recursive' : recursive, 'trust' : trust, 'target_key_file_on_source_entry' : target_key_file_on_source_entry}).start())
 copy_button.grid(row = 22, column = 0, padx = 4, pady = 4, columnspan = 2, sticky = 'nsew')
 main.mainloop()
