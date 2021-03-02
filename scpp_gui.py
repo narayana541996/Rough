@@ -43,12 +43,13 @@ def set_auth(authentication, trust, *args, **kwargs):
 
 def set_target_key_file_on_source(trust, authentication, *args, **kwargs):
     if trust.get():            
-        if (authentication.get() == 'password' or target_ssh_password_entry.get().split()) and not target_ssh_file_entry.get().split():
+        if authentication.get() == 'password' or target_ssh_password_entry.get().split() or not target_ssh_file_entry.get().split():
             normal = [target_key_file_on_source_button, target_key_file_on_source_label, target_key_file_on_source_entry]
             disabled = [copy_target_key_button]
         else:
             normal = [target_key_file_on_source_button, copy_target_key_button, target_key_file_on_source_label, target_key_file_on_source_entry]
             disabled = []
+        target_key_file_on_source.set(True)
     else:
         normal = []
         disabled = [target_key_file_on_source_button, copy_target_key_button, target_key_file_on_source_label, target_key_file_on_source_entry]
@@ -56,7 +57,7 @@ def set_target_key_file_on_source(trust, authentication, *args, **kwargs):
 
 def target_ssh_password_entry_binding(authentication, trust, *args, **kwargs):
     if trust.get():
-        if (authentication.get() == 'password' or target_ssh_password_entry.get().split()) and not target_ssh_file_entry.get().split():
+        if authentication.get() == 'password' or target_ssh_password_entry.get().split() or not target_ssh_file_entry.get().split():
             set_mode(normal = [], disabled = [copy_target_key_button])
         else:
             set_mode(normal = [copy_target_key_button], disabled = [])
@@ -81,7 +82,7 @@ target_key_file_on_source = BooleanVar(main)
 recursive.set(True)
 authentication.set('ssh')
 trust.set(False)
-target_key_file_on_source.set(True)
+
 #copy_type_radiobuttons = Radiobutton(main, )
 source_hostname_label = Label(main, text = 'Source IP/Hostname: ')
 source_hostname_label.grid(row = 1, column = 0, padx = 4, pady = 4, sticky = 'w')
