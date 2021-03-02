@@ -53,7 +53,11 @@ def set_target_key_file_on_source(trust, authentication, *args, **kwargs):
     else:
         normal = []
         disabled = [target_key_file_on_source_button, copy_target_key_button, target_key_file_on_source_label, target_key_file_on_source_entry]
+        target_key_file_on_source_button.state(['!focus','!selected'])
+        copy_target_key_button.state(['!focus','!selected'])
+
     set_mode(disabled = disabled, normal = normal)
+    
 
 def target_ssh_password_entry_binding(authentication, trust, *args, **kwargs):
     if trust.get():
@@ -118,7 +122,7 @@ target_folderpath_entry.grid(row = 8, column = 1, padx = 4, pady = 4, sticky = '
 
 trust_button = Checkbutton(main, text = 'Establish trust between the servers with a key-pair.', variable = trust, onvalue = True, offvalue = False)
 
-copy_target_key_button = Radiobutton(main, text = 'Copy the key given in the \'Target SSH Key File Path\' to source,\nto establish trust with the target.', variable = target_key_file_on_source, value = False)
+copy_target_key_button = Radiobutton(main, text = 'Copy the key given in the \'Target SSH Key File Path\'\nto source, to establish trust with the target.', variable = target_key_file_on_source, value = False)
 password_radiobutton = Radiobutton(main, text = 'Access with Password ', variable = authentication, value = 'password', command = lambda: set_auth(authentication, trust, source_ssh_file_label, source_ssh_file_entry, source_ssh_password_label, source_ssh_password_entry, target_ssh_file_label, target_ssh_file_entry, target_ssh_password_label, target_ssh_password_entry, copy_target_key_button, source_password_label, source_password_entry, target_password_label, target_password_entry))
 password_radiobutton.grid(row = 9, column = 0, padx = 4, pady = 4, sticky = 'w')
 source_password_label = Label(main, text = 'Source Password: ')
@@ -142,11 +146,11 @@ source_ssh_password_label.grid(row = 15, column = 0, padx = 4, pady = 4, sticky 
 source_ssh_password_entry = Entry(main, show = '*', width = 50)
 source_ssh_password_entry.grid(row = 16, column = 0, padx = 4, pady = 4, sticky = 'w')
 
-target_ssh_file_label = Label(main, text = 'Target SSH Key-File Path: ')#####Ask user if ssh file for target exists on source
+target_ssh_file_label = Label(main, text = 'Target SSH Key File Path: ')#####Ask user if ssh file for target exists on source
 target_ssh_file_label.grid(row = 13, column = 1, padx = 4, pady = 4, sticky = 'w')
 target_ssh_file_entry = Entry(main, width = 50)
 target_ssh_file_entry.grid(row = 14, column = 1, padx = 4, pady = 4, sticky = 'w')
-target_ssh_password_label = Label(main, text = 'Target SSH Key-File Password(if required): ')###Pass ssh-file password with ssh-copy-id
+target_ssh_password_label = Label(main, text = 'Target SSH Key File Password(if required): ')###Pass ssh-file password with ssh-copy-id
 target_ssh_password_label.grid(row = 15, column = 1, padx = 4, pady = 4, sticky = 'w')
 target_ssh_password_entry = Entry(main, show = '*', width = 50)
 target_ssh_password_entry.grid(row = 16, column = 1, padx = 4, pady = 4, sticky = 'w')

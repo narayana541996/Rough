@@ -54,7 +54,6 @@ def scp_(source_ssh_file, source_username, source_host, target_ssh_file, copy_fi
         create_key_filename = f'scpp_key_{datetime.now().strftime("%d-%b-%y-%X")}'
         stdin, stdout, stderr = client.exec_command(f'ssh-keygen -b {bits} -f ~/.ssh/{create_key_filename}')
         stdin2, stdout2, stderr2 = client.exec_command(f'chmod 0600 ~/.ssh/{create_key_filename}')
-        #print('generate_key:\nstdout: ', stdout.read(),' stderr: ', stderr.read(),' stdout2: ',stdout2.read(),' stderr2: ', stderr2.read())
         return create_key_filename
 
     def ssh(ssh_file, hostname, username, password = None):
@@ -130,14 +129,10 @@ def scp_(source_ssh_file, source_username, source_host, target_ssh_file, copy_fi
                                 ####proceed to establish trust, else, show that trust is already established. 
                 #####If trust is not yet established, try connecting with an existing key, to the target. If it gives no output,
                 ####create a new key-pair and copy the new public key to target's authorized_keys.
-                #stdin1, stdout1, stderr1 = ssh_source.exec_command(f'ssh-copy-id -f -o "IdentityFile ~/.ssh/{target_ssh_file.split("/")[-1]}" -i ~/.ssh/{target_key_file_on_source} {target_username}@{target_host}')
-                #print('old stdout1: ',stdout1.read(),' stderr1: ',stderr1.read())
-                #if not stdout1.read() and ('error' not in str(stdout1.read()).lower()):
                 create_key_filename = generate_key(target_username, target_host, ssh_source, create_key_bits)
                 print('create_key_filename: ',create_key_filename)
                 target_filename = ''
                 if not target_key_file_on_source:
-                    #scp_to(scp_client = source_scp_client, target_directory_path = '~/.ssh', recursive = recursive, files = target_ssh_file)
                     if target_ssh_file:
                         source_scp_client.put(files = target_ssh_file, remote_path = '~/.ssh', recursive = recursive)
                         target_filename = target_ssh_file.split("/")[-1]
@@ -180,4 +175,4 @@ def scp_(source_ssh_file, source_username, source_host, target_ssh_file, copy_fi
         ssh_target.close()
     return response
 if __name__ == '__main__':
-    scp_(source_ssh_file = r'C:/Users/krish/Downloads/inst-trial-3.pem', source_username ='ubuntu', source_host = '13.233.154.105', source_password = '', target_ssh_file = r'C:/Users/krish/Downloads/inst-trial-3.pem', copy_filepath = '/home/ubuntu/upload_test', target_username = 'ubuntu', target_host = '13.233.194.231', target_directory_path = '~/', recursive = True, target_password = '', target_key_file_on_source = '~/.ssh/id_dsa', establish_trust = True)
+    scp_(source_ssh_file = r'C:/Users/krish/Downloads/inst-trial-3.pem', source_username ='ubuntu', source_host = '65.0.138.89', source_password = '', target_ssh_file = r'C:/Users/krish/Downloads/inst-trial-3.pem', copy_filepath = '/home/ubuntu/upload_test', target_username = 'ubuntu', target_host = '13.233.163.225', target_directory_path = '~/', recursive = True, target_password = '', target_key_file_on_source = '~/.ssh/id_dsa', establish_trust = True)
