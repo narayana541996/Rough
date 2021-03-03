@@ -69,8 +69,6 @@ def target_ssh_password_entry_binding(authentication, trust, *args, **kwargs):
         set_mode(normal = [], disabled = [copy_target_key_button])
 
 def target_ssh_file_entry_binding(authentication, trust, *args, **kwargs):
-    #if (authentication.get() == 'password' or target_ssh_password_entry.get().split()) and not target_ssh_file_entry.get().split():
-     #   set_mode(normal = [], disabled = [copy_target_key_button])
      target_ssh_password_entry_binding(authentication, trust, *args, **kwargs)
 
 root = Tk()
