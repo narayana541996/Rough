@@ -14,16 +14,16 @@ def scp_(source_ssh_file, source_username, source_host, target_ssh_file, copy_fi
         global response
         print(f'copying {files} to {target_directory_path}...')
         try:
-            scp_client.put(files = files, remote_path = format(target_directory_path.strip()), recursive = recursive)##scp.SCPException: scp: root/: Is a directory
+            scp_client.put(files = files, remote_path = format(target_directory_path.strip()), recursive = recursive)
         except SCPException as e:
             if 'not a regular file' in str(e):
-                response = f'-1-\n{files} doesn\'t look like some regular file(s), recursion must be turned on to continue.\nDo you wish to turn on recursion?'
+                response = f'-1-\n{files} doesn\'t look like some regular file(s), recursion must be turned on to continue.\nDo you wish to turn on recursive?'
             elif 'ambiguous target' in str(e):
                 response = f'-2-Cannot find the target folder path. Please check the folder path entered and try again.'
             else:
                 raise
         except FileNotFoundError:
-            response = f'\n-3-Cannot find the file to be copied, please make sure that the path entered is correct, or if you\'re trying to copy a folder, turn on recursion.'
+            response = f'\n-3-Cannot find the file to be copied, please make sure that the path entered is correct. If you\'re trying to copy a folder, turn on recursive.'
             print('scp_to filenotfound: ',response)
             return
         except PermissionError as e:
@@ -38,11 +38,11 @@ def scp_(source_ssh_file, source_username, source_host, target_ssh_file, copy_fi
             scp_client.get(remote_path = source_filepath.strip(), recursive = recursive)
         except SCPException as e:
             if 'not a regular file' in str(e):
-                response = f'\n-5-{source_filepath} doesn\'t look like some regular file(s), recursion must be turned on to continue.\nDo wish to turn on recursion?'
+                response = f'\n-5-{source_filepath} doesn\'t look like some regular file(s), recursion must be turned on to continue.\nDo wish to turn on recursive?'
             else:
                 response = f'\n{str(e).split(":")[-2]} : {str(e).split(":")[-1]}.\n'
         except FileNotFoundError:
-            response = f'\n-6-Cannot find the file to be copied, please make sure that the path entered is correct, or if you\'re trying to copy a folder, turn on recursion.'
+            response = f'\n-6-Cannot find the file to be copied, please make sure that the path entered is correct. If you\'re trying to copy a folder, turn on recursive.'
             print('scp_from filenotfounderror: ',response)
             return
         except PermissionError as e:
@@ -83,7 +83,6 @@ def scp_(source_ssh_file, source_username, source_host, target_ssh_file, copy_fi
                 print('ssh_file: ',ssh_file)
                 os.chmod(os.path.expanduser('~/.ssh'), 0o700)
                 os.chmod(ssh_file, 0o600)
-                #run(['chmod','0644', ssh_file])#cannot find file
                 client.connect(hostname = hostname, username = username, port = 22, pkey = key)
 
             except paramiko.AuthenticationException:
@@ -91,7 +90,6 @@ def scp_(source_ssh_file, source_username, source_host, target_ssh_file, copy_fi
                     client.connect(hostname = hostname, username = username, port = 22, password = password)
                 else:
                     response = f'-10-Cannot access {hostname} with the given username and key. Please check the username entered or try using a different key or password.'
-                    #return f'Cannot access {username}@{hostname} with the given key. Please try using a different key or password.'
                     return
         except TimeoutError:
             response = f'-11-{hostname} isn\'t responding, please make sure that the server is up and running and that the entered values are correct and try again.'
@@ -121,18 +119,14 @@ def scp_(source_ssh_file, source_username, source_host, target_ssh_file, copy_fi
             response = f'-12-Copied {copy_filepath} from {source_username}@{source_host} to {target_username}@{target_host}.'
         else:
             return response
-        print('establish_trust: ',establish_trust)
         if establish_trust:######if establish_trust is true, try to establish trust, else, skip establishing trust.
             stdin2, stdout2, stderr2 = ssh_source.exec_command(f'ssh -o "StrictHostKeyChecking No" -tt {target_username}@{target_host}')
             print('stdout2: ',stdout2.read(),' stderr2: ',stderr2.read())
-            if not stdout2.read():######Try to ssh into the target, if it gives no output,
-                                ####proceed to establish trust, else, show that trust is already established. 
-                #####If trust is not yet established, try connecting with an existing key, to the target. If it gives no output,
-                ####create a new key-pair and copy the new public key to target's authorized_keys.
+            if not stdout2.read():######Try to ssh into the target, if it gives no output, proceed to establish trust, else, show that trust is already established.
                 create_key_filename = generate_key(target_username, target_host, ssh_source, create_key_bits)
-                print('create_key_filename: ',create_key_filename)
-                catin, catout, caterr = ssh_source.exec_command(f'cat {create_key_filename}')
-                print('catout: ',catout.read(),' caterr: ',caterr.read())
+                print('create_key_filename: ',create_key_filename)#####If trust is not yet established, try connecting with an existing key, to the target. If it gives no output,
+                #catin, catout, caterr = ssh_source.exec_command(f'cat {create_key_filename}')####create a new key-pair and copy the new public key to target's authorized_keys.
+                #print('catout: ',catout.read(),' caterr: ',caterr.read())
                 target_filename = ''
                 if not target_key_file_on_source:
                     if target_ssh_file:
@@ -146,28 +140,34 @@ def scp_(source_ssh_file, source_username, source_host, target_ssh_file, copy_fi
                         return response
                 else:
                     print('target_key_file_on_source: ', target_key_file_on_source)
-                    stdin1, stdout1, stderr1 = ssh_source.exec_command(f'ssh-copy-id -f -o "StrictHostKeyChecking No" -o "IdentityFile {target_key_file_on_source}" -i ~/.ssh/{create_key_filename} {target_username}@{target_host}')
+                    stdin1, stdout1, stderr1 = ssh_source.exec_command(f'ssh-copy-id -f -o "StrictHostKeyChecking No" -o "IdentityFile {target_key_file_on_source}" -i {create_key_filename} {target_username}@{target_host}')
                 print('new stdout1: ',stdout1.read(),' stderr1: ',stderr1.read())
                 chin2, chout2, cherr2 = ssh_source.exec_command(f'chmod 0700 ~/.ssh')
                 print('chout2: ',chout2.read(),' cherr2: ',cherr2.read())
                 if target_filename:
                     rmin, rmout, rmerr = ssh_source.exec_command(f'rm ~/.ssh/{target_filename}')
                     print('rmout: ',rmout.read(),' rmerr: ',rmerr.read())
+                ################################################################################################################################################################################################################################
+                ###################################################################################################################################################################################################################
                 stdin2, stdout2, stderr2 = ssh_source.exec_command(f'ssh -tt {target_username}@{target_host}')
-                print('stdout2: ', stdout2.read(),' stderr2: ', stderr2.read())
+                
                 if stdout2.read() and ('error' not in str(stdout2.read()).lower()):
                     response = f'-13-{response}\nEstablished Trust between {source_username}@{source_host} and {target_username}@{target_host}.'
                 #elif 'permission denied (publickey)' in str(stdout2.read()).lower() or ('permission denied (publickey)' in str(stderr2.read().lower())) or ('host key verification failed' in str(stdout2.read().lower()) or ('host key verification failed' in str(stderr2.read().lower()))):
                 else:
-                    print('elif permission denied: stdout2: ',stdout2.read(),' stderr2: ',stderr2.read())
+                    
                     stdin2, stdout2, stderr2 = ssh_source.exec_command(f'ssh -tt -o "StrictHostKeyChecking  No" -i {create_key_filename} {target_username}@{target_host}')
+                    print('stdout2: ', stdout2.read(),' stderr2: ', stderr2.read())
                     if stdout2.read() and ('error' not in stdout2.read().lower()):
                         response = f'-14-{response}\nCouldn\'t establish trust between {source_username}@{source_host} and {target_username}@{target_host},\ncreated a key-pair to allow the source to access the target instead.'
-                        return resonse
+                        print('elif permission denied: stdout2: ',stdout2.read(),' stderr2: ',stderr2.read())
+                        return response
                     else:
                         print('else permission denied: stdout2: ',stdout2.read(),' stderr2: ',stderr2.read())
                         response = f'-15-{response}\nCouldn\'t establish trust between {source_username}@{source_host} and {target_username}@{target_host}.'
                         return response
+                ##################################################################################################################################################################################################################################
+                ##################################################################################################################################################################################################################
                 #else:
                  #   response = f'-16-{response}\nCouldn\'t establish trust between {source_username}@{source_host} and {target_username}@{target_host}.'
                   #  return response
@@ -181,4 +181,4 @@ def scp_(source_ssh_file, source_username, source_host, target_ssh_file, copy_fi
         ssh_target.close()
     return response
 if __name__ == '__main__':
-    scp_(source_ssh_file = r'C:/Users/krish/Downloads/inst-trial-3.pem', source_username ='ubuntu', source_host = '13.233.153.40', source_password = '', target_ssh_file = r'C:/Users/krish/Downloads/inst-trial-3.pem', copy_filepath = '/home/ubuntu/upload_test', target_username = 'ubuntu', target_host = '13.233.122.205', target_directory_path = '~/', recursive = True, target_password = '', target_key_file_on_source = '~/.ssh/scpp_key_02-Mar-21-16:39:56', establish_trust = True)
+    print(scp_(source_ssh_file = r'C:/Users/krish/Downloads/inst-trial-3.pem', source_username ='ubuntu', source_host = '52.66.241.175', source_password = '', target_ssh_file = r'C:/Users/krish/Downloads/inst-trial-3.pem', copy_filepath = '/home/ubuntu/upload_test', target_username = 'ubuntu', target_host = '65.0.176.231', target_directory_path = '~/', recursive = True, target_password = '', target_key_file_on_source = '~/.ssh/scpp_key_02-Mar-21-16:39:56', establish_trust = True))

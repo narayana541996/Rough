@@ -8,7 +8,7 @@ from ttkthemes import *
 def local_scp(source_ssh_file_entry, source_username_entry, source_hostname_entry, target_ssh_file_entry, copy_filepath_entry, target_username_entry, target_hostname_entry, target_folderpath_entry, recursive, trust, target_key_file_on_source_entry, create_key_bits = 1024):
     #print('local trust: ',trust,' trust.get: ', trust.get())
     response = scpp.scp_(source_ssh_file = source_ssh_file_entry.get().strip().replace('\\','/'), source_username = source_username_entry.get().strip().replace('\\','/'), source_host = source_hostname_entry.get().strip().replace('\\','/'), target_ssh_file = target_ssh_file_entry.get().strip().replace('\\','/'), copy_filepath = copy_filepath_entry.get().strip().replace('\\','/'), target_username = target_username_entry.get().strip().replace('\\','/'), target_host = target_hostname_entry.get().strip().replace('\\','/'), target_directory_path = target_folderpath_entry.get().strip().replace('\\','/'), recursive = recursive.get(), establish_trust = trust.get(), create_key_bits = create_key_bits, target_key_file_on_source = target_key_file_on_source_entry.get().strip().replace('\\', '/'))
-    
+    print('local_scp response: ',response)
     if 'Do you wish to turn on recursion?' in response:
         message = show_message(message_box = askyesno, message = response)
         if message == 'yes':
