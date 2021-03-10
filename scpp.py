@@ -7,7 +7,7 @@ from subprocess import *
 from datetime import datetime
 
 response = ''
-def scp_(source_ssh_file, source_username, source_host, target_ssh_file, copy_filepath, target_username, target_host, target_directory_path, recursive, establish_trust, source_password = '', target_password = '', target_key_file_on_source = '', create_key_bits = '1024'):
+def scp_(source_ssh_file, source_username, source_host, target_ssh_file, copy_filepath, target_username, target_host, target_directory_path, recursive, establish_trust, source_password = None, target_password = None, target_key_file_on_source = '', create_key_bits = '1024'):
     filename = copy_filepath.split('/')[-1]
     global response
     def scp_to(scp_client, target_directory_path, recursive, files = filename):
@@ -60,7 +60,7 @@ def scp_(source_ssh_file, source_username, source_host, target_ssh_file, copy_fi
         global response
         client = paramiko.SSHClient()
         try:
-            key = paramiko.RSAKey.from_private_key_file(filename = ssh_file)
+            key = paramiko.RSAKey.from_private_key_file(filename = ssh_file, password = password)
         except FileNotFoundError:
             response = '-8-Cannot find the key file, please check the path entered and try again.'
             return
@@ -72,6 +72,9 @@ def scp_(source_ssh_file, source_username, source_host, target_ssh_file, copy_fi
                 key = paramiko.DSSKey.from_private_key_file(filename = ssh_file)
             elif 'unpack requires a buffer of 4 bytes' in str(e):
                 key = paramiko.Ed25519Key.from_private_key_file(filename = ssh_file)
+            elif 'private key file is encrypted' in str(e):
+                response = f'{ssh_file} is encrypted, please try again with the password for the private key file.'
+                return
         client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         try:
             client.connect(hostname = hostname, username = username, port = 22, pkey = key)
@@ -115,7 +118,7 @@ def scp_(source_ssh_file, source_username, source_host, target_ssh_file, copy_fi
             shutil.rmtree(filename)
         if os.path.isfile(filename):
             os.remove(filename)
-        if ('doesn\'t look like some regular file'not in response.lower()) and ('cannot find the file to be copied' not in response.lower()) and ('permission denied' not in response.lower()):
+        if ('doesn\'t look like some regular file' not in response.lower()) and ('cannot find the file to be copied' not in response.lower()) and ('permission denied' not in response.lower()):
             response = f'-12-Copied {copy_filepath} from {source_username}@{source_host} to {target_username}@{target_host}.'
         else:
             return response
@@ -141,9 +144,10 @@ def scp_(source_ssh_file, source_username, source_host, target_ssh_file, copy_fi
                 else:
                     print('target_key_file_on_source: ', target_key_file_on_source)
                     stdin1, stdout1, stderr1 = ssh_source.exec_command(f'ssh-copy-id -f -o "StrictHostKeyChecking No" -o "IdentityFile {target_key_file_on_source}" -i {create_key_filename} {target_username}@{target_host}')
-                print('new stdout1: ',stdout1.read(),' stderr1: ',stderr1.read())
+                    print('new stdout1: ',stdout1.read(),' stderr1: ',stderr1.read())
                 chin2, chout2, cherr2 = ssh_source.exec_command(f'chmod 0700 ~/.ssh')
                 print('chout2: ',chout2.read(),' cherr2: ',cherr2.read())
+                print('target_filename: ',target_filename)
                 if target_filename:
                     rmin, rmout, rmerr = ssh_source.exec_command(f'rm ~/.ssh/{target_filename}')
                     print('rmout: ',rmout.read(),' rmerr: ',rmerr.read())
@@ -155,7 +159,6 @@ def scp_(source_ssh_file, source_username, source_host, target_ssh_file, copy_fi
                     response = f'-13-{response}\nEstablished Trust between {source_username}@{source_host} and {target_username}@{target_host}.'
                 #elif 'permission denied (publickey)' in str(stdout2.read()).lower() or ('permission denied (publickey)' in str(stderr2.read().lower())) or ('host key verification failed' in str(stdout2.read().lower()) or ('host key verification failed' in str(stderr2.read().lower()))):
                 else:
-                    
                     stdin2, stdout2, stderr2 = ssh_source.exec_command(f'ssh -tt -o "StrictHostKeyChecking  No" -i {create_key_filename} {target_username}@{target_host}')
                     print('stdout2: ', stdout2.read(),' stderr2: ', stderr2.read())
                     if stdout2.read() and ('error' not in stdout2.read().lower()):
@@ -181,4 +184,4 @@ def scp_(source_ssh_file, source_username, source_host, target_ssh_file, copy_fi
         ssh_target.close()
     return response
 if __name__ == '__main__':
-    print(scp_(source_ssh_file = r'C:/Users/krish/Downloads/inst-trial-3.pem', source_username ='ubuntu', source_host = '52.66.241.175', source_password = '', target_ssh_file = r'C:/Users/krish/Downloads/inst-trial-3.pem', copy_filepath = '/home/ubuntu/upload_test', target_username = 'ubuntu', target_host = '65.0.176.231', target_directory_path = '~/', recursive = True, target_password = '', target_key_file_on_source = '~/.ssh/scpp_key_02-Mar-21-16:39:56', establish_trust = True))
+    print(scp_(source_ssh_file = r'C:/Users/krish/Downloads/inst-trial-3.pem', source_username ='ubuntu', source_host = '13.126.141.26', source_password = '', target_ssh_file = r'C:/Users/krish/Downloads/inst-trial-3.pem', copy_filepath = '/home/ubuntu/upload_test', target_username = 'ubuntu', target_host = '15.207.71.107', target_directory_path = '~/', recursive = True, target_password = '', target_key_file_on_source = '~/.ssh/scpp_key_02-Mar-21-16:39:56', establish_trust = True))
