@@ -162,7 +162,7 @@ ssh_radiobutton.invoke()
 trust_button.grid(row = 17, column = 0, padx = 4, pady = 4, sticky = 'w')###If ssh key file has password, disable COPY OPTION.
 target_key_file_on_source_button = Radiobutton(main, text = 'Use target\'s key on the source to establish trust\nbetween the source and the target.', variable = target_key_file_on_source, value = True)
 target_key_file_on_source_button.grid(row = 18, column = 0, padx = 4, pady = 4, sticky = 'w')
-target_key_file_on_source_label = Label(main, text = 'Enter the path of the key-pair on the source to establish trust: ', state = 'disabled')
+target_key_file_on_source_label = Label(main, text = 'Enter the absolute path of the key-pair on the source to establish trust: ', state = 'disabled')
 target_key_file_on_source_label.grid(row = 19, column = 0, padx = 4, pady = 4, sticky = 'w')
 target_key_file_on_source_entry = Entry(main, width = 50, state = 'disabled')
 target_key_file_on_source_entry.grid(row = 20, column = 0, padx = 4, pady = 4, sticky = 'w')
