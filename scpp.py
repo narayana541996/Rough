@@ -181,7 +181,7 @@ def scp_(source_ssh_file, source_username, source_host, target_ssh_file, copy_fi
                     finally:
                         stdout2.channel.close()
                         if stdout2.readline() and ('last login' in str(stdout2.read()).lower()):
-                            response = f'{response}\nCouldn\'t establish trust between {source_username}@{source_host} and {target_username}@{target_host}, created a key-pair({create_key_filename}) to allow the source to access the target instead.'
+                            response = f'{response}\nCouldn\'t establish trust between {source_username}@{source_host} and {target_username}@{target_host}, created a key-pair ({create_key_filename}) to allow the source to access the target instead.'
                             print('elif permission denied: stdout2: ',stdout2.read(),' stderr2: ',stderr2.read())
                             ssh_source.close()
                             ssh_target.close()
