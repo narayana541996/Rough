@@ -22,6 +22,8 @@ def show_message(message_box, message):
 
 def set_mode(disabled, normal, *args, **kwargs):
     for item in disabled:
+        if isinstance(item, Entry):
+            item.delete(0,'end')
         item['state'] = 'disabled'
     for item in normal:
         item['state'] = 'normal'
@@ -68,6 +70,7 @@ def target_ssh_password_entry_binding(authentication, trust, *args, **kwargs):
 
 def target_ssh_file_entry_binding(authentication, trust, *args, **kwargs):
      target_ssh_password_entry_binding(authentication, trust, *args, **kwargs)
+
 
 root = Tk()
 main = Frame(root)

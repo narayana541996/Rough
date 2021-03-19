@@ -203,5 +203,5 @@ def scp_(source_ssh_file, source_username, source_host, target_ssh_file, copy_fi
     ssh_target.close()
     return response
 if __name__ == '__main__':
-    print(scp_(source_ssh_file = r'C:/Users/krish/Downloads/inst-trial-3.pem', source_username ='ubuntu', source_host = '65.1.107.183', source_password = '', target_ssh_file = r'C:/Users/krish/Downloads/inst-trial-3.pem', copy_filepath = '/home/ubuntu/upload_test', target_username = 'ubuntu', target_host = '13.126.123.22', target_directory_path = '~/', recursive = True, target_password = '', target_key_file_on_source = '~/.ssh/scpp_key_02-Mar-21-16:39:56', establish_trust = True))
+    print(scp_(source_ssh_file = r'C:/Users/krish/Downloads/inst-trial-3.pem', source_username ='ubuntu', source_host = '13.232.112.200', source_password = '', target_ssh_file = r'C:/Users/krish/Downloads/inst-trial-3.pem', copy_filepath = '/home/ubuntu/upload_test', target_username = 'ubuntu', target_host = '15.207.110.80', target_directory_path = '~/', recursive = True, target_password = '', establish_trust = True))
 #C:/Users/krish/.ssh/scpp-key
