@@ -17,7 +17,7 @@ def local_scp(source_ssh_file_entry, source_ssh_password_entry, source_username_
         message = show_message(message_box = showerror, message = response)
         
 
-def show_message(message_box, message):
+def show_message(message_box, message):#########fix the message box formatting.
     return message_box(title = 'Response', message = message)
 
 def set_mode(disabled, normal, *args, **kwargs):
@@ -77,7 +77,7 @@ main = Frame(root)
 main.pack()
 style = ThemedStyle(main)
 style.set_theme('vista')
-#style.configure('TButton', justify = 'center')
+style.configure('TMessageBox', justify = 'center')
 recursive = BooleanVar(main)
 authentication = StringVar(main)
 trust = BooleanVar(main)
