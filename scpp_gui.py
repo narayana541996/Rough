@@ -4,8 +4,15 @@ import scpp
 import threading
 from tkinter.ttk import *
 from ttkthemes import *
+
 def local_scp(source_ssh_file_entry, source_ssh_password_entry, source_username_entry, source_hostname_entry, target_ssh_file_entry, target_ssh_password_entry, copy_filepath_entry, target_username_entry, target_hostname_entry, target_folderpath_entry, recursive, trust, target_key_file_on_source_entry, create_key_bits = 1024):
-    response = scpp.scp_(source_ssh_file = source_ssh_file_entry.get().strip().replace('\\','/'), source_password = source_ssh_password_entry.get(), source_username = source_username_entry.get().strip(), source_host = source_hostname_entry.get().strip(), target_ssh_file = target_ssh_file_entry.get().strip().replace('\\','/'), target_password = target_ssh_password_entry.get(), copy_filepath = copy_filepath_entry.get().strip().replace('\\','/'), target_username = target_username_entry.get().strip(), target_host = target_hostname_entry.get().strip(), target_directory_path = target_folderpath_entry.get().strip().replace('\\','/'), recursive = recursive.get(), establish_trust = trust.get(), create_key_bits = create_key_bits, target_key_file_on_source = target_key_file_on_source_entry.get().strip().replace('\\', '/'))
+    if source_hostname_entry.get() and target_hostname_entry.get():
+        if source_username_entry.get() and target_username_entry.get():
+            response = scpp.scp_(source_ssh_file = source_ssh_file_entry.get().strip().replace('\\','/'), source_password = source_ssh_password_entry.get(), source_username = source_username_entry.get().strip(), source_host = source_hostname_entry.get().strip(), target_ssh_file = target_ssh_file_entry.get().strip().replace('\\','/'), target_password = target_ssh_password_entry.get(), copy_filepath = copy_filepath_entry.get().strip().replace('\\','/'), target_username = target_username_entry.get().strip(), target_host = target_hostname_entry.get().strip(), target_directory_path = target_folderpath_entry.get().strip().replace('\\','/'), recursive = recursive.get(), establish_trust = trust.get(), create_key_bits = create_key_bits, target_key_file_on_source = target_key_file_on_source_entry.get().strip().replace('\\', '/'))
+        else:
+            response = 'Please enter the username for source and target.'
+    else:
+        response = 'Please enter the IP addresses of the source and target.'
     print('local_scp response: ',response)
     if 'Do you wish to turn on recursion?' in response:
         message = show_message(message_box = askyesno, message = response)
@@ -17,8 +24,8 @@ def local_scp(source_ssh_file_entry, source_ssh_password_entry, source_username_
         message = show_message(message_box = showerror, message = response)
         
 
-def show_message(message_box, message):#########fix the message box formatting.
-    return message_box(title = 'Response', message = message)
+def show_message(message_box, message):
+    return message_box(title = 'Scpp\'s Response', message = message)
 
 def set_mode(disabled, normal, *args, **kwargs):
     for item in disabled:
@@ -73,10 +80,12 @@ def target_ssh_file_entry_binding(authentication, trust, *args, **kwargs):
 
 
 root = Tk()
+root.title('Scpp')
+root.resizable(0,0)
 main = Frame(root)
 main.pack()
 style = ThemedStyle(main)
-style.set_theme('vista')
+style.set_theme('arc')
 style.configure('TMessageBox', justify = 'center')
 recursive = BooleanVar(main)
 authentication = StringVar(main)
@@ -107,7 +116,7 @@ target_username_label.grid(row = 3, column = 1, padx = 4, pady = 4, sticky = 'w'
 target_username_entry = Entry(main, width = 50)
 target_username_entry.grid(row = 4, column = 1, padx = 4, pady = 4, sticky = 'w')
 
-copy_filepath_label = Label(main, text = 'Absolute Path of File to be Copied: ')
+copy_filepath_label = Label(main, text = 'Absolute Path of the File to be Copied: ')
 copy_filepath_label.grid(row = 7, column =0, padx = 4, pady = 4, sticky = 'w')
 copy_filepath_entry = Entry(main, width = 50)
 copy_filepath_entry.grid(row = 8, column = 0 , padx = 4, pady = 4, sticky = 'w')
