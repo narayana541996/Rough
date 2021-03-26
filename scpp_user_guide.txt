@@ -1,0 +1,24 @@
+Step1: On launching the programme, the main window is displayed.
+
+Step2: Enter the IP address and username of the server on which the file to be copied exists, in the 'Source IP/Hostname' and 'Source Username' entries.
+
+Step3: Enter the IP address and username of the server to which the file is to be copied, in the 'Target IP/Hostname' and 'Target Username' entries.
+
+Step4: Enter absolute path of the file to be copied, in the 'Absolute Path of the File to be Copied' entry.
+
+Step5: Enter the absolute path of the folder to which the file is to be copied, in the 'Absolute Path of the Destination Folder' entry.
+
+Step6: If you wish to use password for authentication, select the 'Access with Password' radiobutton.
+        1: Enter the password for source in the 'Source Password' entry and the password for target in the 'Target Password' entry.
+       If you wish to use ssh-key for authentication, select the 'Access with SSH' radiobutton.
+        1: Enter the absolute path for the ssh-key of source server in the machine you're running this programme on, in the 'Source SSH Key File Path' entry, and password for the ssh-key in the 'Source SSH Key File Password' entry if required.
+        2: Enter the absolute path for the ssh-key of target server in the machine you're running this programme on, in the 'Target SSH Key File Path' entry, and password for the ssh-key in the 'Target SSH Key File Password' entry if required.
+
+Step7: If you wish to allow the source server to access the target server without authentication, turn on 'Establish Trust' checkbutton. This creates a new key and makes an attempt to let the target trust the source, by sending a request to the target server to allow the source to access it without prompting for authentication. 
+        1: If 'Establish Trust' is turned on, select 'Use target's key on the source to establish trust between the source and the target.' radiobutton if the source already has a key that can access the target server and enter the absolute path of the key in 'Enter the absolute path of the key-pair on the source to establish trust' entry.
+        2: If the source server does not have any key that can access the target server, select 'Copy the key given in the 'Target SSH Key File Path' to source, to establish trust with the target.' radiobutton or leave the 'Enter the absolute path of the key-pair on the source to establish trust' empty. This makes an attempt to copy the file mentioned in the 'Target SSH Key File Path' to the source for authentication and deletes the copied ssh-key file once done. This works only if 'Access with SSH' radiobutton is selected and the 'Target SSH Key File Password' is empty.
+        NOTE: This only attempts to send a request to the target server to trust the source server, it's success depends on several conditions.
+
+Step8: If you're trying to copy a folder from the source server to the target server, make sure that the 'Recursive' checkbutton is turned on. If you're copying a file, it can be ignored.
+
+Step9: Finally, Click on the Copy button to initiate the process, after which a message box appears indicating success or failure of the process.
