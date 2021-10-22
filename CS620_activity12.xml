@@ -1,0 +1,18 @@
+<!--Activity 12 - Submitted by Lakshmi Narayana Podagatlapalli(01087265)-->
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<catfood type = 'basic'>
+    <manufacturer>Purina</manufacturer>
+    <contact>
+        <address class = 'USA'>12 Cat Way</address>
+    </contact>
+    <date>2019-10-01</date>
+
+    <!--New catfood brand-->
+    
+    <manufacturer>Chewy</manufacturer>
+    <contact>
+        <address class = 'Canada'>Earth</address>
+    </contact>
+    <date>2021-10-04</date>
+</catfood>
+<!--I don't know any catfood brands, the information shown here is imaginary, I take no responsiblity for it's correctness.-->
