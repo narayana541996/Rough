@@ -1,0 +1,36 @@
+h1 {
+    text-align : center;
+    background-color: yellow;
+    color : red;
+}
+
+img {
+    display : block;
+    margin : auto;
+    text-align : center;
+    height : 50vh;
+}
+
+p {
+    font-size: 1.5rem;
+    color: green;
+}
+table {
+    border-collapse: collapse;
+    text-align : center;
+    font-size : 1.5rem;
+    margin : auto;
+    color: green;
+}
+
+tr:nth-child(odd) { background-color: yellow;}
+
+tr, td, th {
+    padding : 10px;
+    margin : 5px;
+    text-align: justify;
+}
+
+.heading { color : orange; }
+
+.name { text-size: 1.7rem; font-weight: bold;}
